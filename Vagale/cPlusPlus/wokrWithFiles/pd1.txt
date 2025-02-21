@@ -1,0 +1,77 @@
+#include <iostream>
+#include <cstdlib>
+#include <fstream>
+#include <string>
+
+using namespace std;
+
+void Task1();
+void Task2();
+void Task3and4();
+
+int main(int argc, char** argv) {
+	setlocale(LC_ALL, "en_US.UTF-8");
+
+	Task1();
+	Task2();
+	Task3and4();
+}
+
+void Task1()
+{
+	// lasa un izvada .csv failu
+	ifstream fReader;
+	string line, place, peopleCountStr;
+	fReader.open("iedzivotaju_skaits_2024.csv");
+
+	cout << ".csv faila kontents: " << endl << endl;
+	while (!fReader.fail() || !fReader.eof())
+	{
+		getline(fReader, line);
+		place = line.substr(0, line.find(','));
+		peopleCountStr = line.substr(line.find(',') + 1, line.length() - (line.find(',') + 1));
+		cout << place << ": " << peopleCountStr << endl;
+	}
+
+	fReader.close();
+}
+
+void Task2()
+{
+	// nolasa un iraksta jaunajaa failaa novadus, kuros ir >30000 iedz.
+	ifstream fReader;
+	ofstream fWriter;
+	string line, peopleCountStr;
+	int peopleCount;
+	fReader.open("iedzivotaju_skaits_2024.csv");
+	fWriter.open("mans_fails.txt");
+
+	while (!fReader.fail() || !fReader.eof())
+	{
+		getline(fReader, line);
+		peopleCountStr = line.substr(line.find(',') + 1, line.length() - (line.find(',') + 1));
+		peopleCount = stoi(peopleCountStr);
+		if (peopleCount > 30000) fWriter << line << "\n";
+	}
+
+	fReader.close();
+	fWriter.close();
+}
+
+void Task3and4()
+{
+	//lasa un izvada jauno failu āāaaa
+	ifstream fReader;
+	string line;
+	int placeCount = 0;
+	fReader.open("mans_fails.txt");
+	cout << endl << "Jauna faila kontents: " << endl << endl;
+	while (!fReader.fail() || !fReader.eof())
+	{
+		getline(fReader, line);
+		cout << line << endl;
+		if (line.length() > 0) placeCount++;
+	}
+	fReader.close();
+	cout << "Novadu skaits jaunajaa failaa: " << to_string(placeCount);
+}

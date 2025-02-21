@@ -1,0 +1,80 @@
+#include <iostream>
+#include <cstdlib>
+#include <fstream>
+using namespace std;
+
+int main()
+{
+    int i, n;
+    cout << "Cik skaitlu bus binaaraa failaa:\n"; cin >> n;
+
+    ofstream f1;
+
+    //ierakstisana no konsoles
+    f1.open("skaitli.bin", ios::binary);
+
+    if (!f1) { cerr << endl << "Nevareeja atveert failu!"; };
+    int num;
+
+    for (i = 1;i <= n;i++)
+    {
+        cout << endl << "Ievadi skaili: ";
+        cin >> num;
+        f1.write((char*)&num, sizeof(int));
+    }
+
+    f1.close();
+
+    //nolasīšana
+    ifstream f2;
+    f2.open("skaitli.bin", ios::binary);
+
+    if (!f2) { cerr << "Nevareeja atveert failu!"; };
+
+    f2.seekg(0, ios::end); //aizgājām līdz faila beigām
+    int n2 = f2.tellg() / sizeof(int); //skaitļu skaits failā
+    cout << endl << endl << "failaa ir " << n2 << " skaitli";
+    f2.seekg(0, ios::beg);
+    int x, sum = 0;
+    cout << endl << "Failaa ir skaitli: ";
+    for (int i = 0; i < n2; i++)
+    {
+        f2.read((char*)&x, sizeof(int));
+        cout <<x<<" ";
+        sum += x;
+    }
+
+    cout << endl <<"Fails tika nolasiits!";
+    cout << endl << "Skaitlu summa: " << sum;
+    f2.close();
+
+    // papildinaasana
+    f1.open("skaitli.bin", ios::app | ios::binary );
+
+    f1.write((char*)&sum, sizeof(int));
+
+    f1.close();
+
+    cout << endl << endl << "Fails tika papildinaats";
+
+    // veel viena nolasiisana
+    f2.open("skaitli.bin", ios::binary);
+
+    if (!f2) { cerr << "Nevareeja atveert failu!"; };
+
+    f2.seekg(0, ios::end); //aizgājām līdz faila beigām
+    n2 = f2.tellg() / sizeof(int);
+    f2.seekg(0, ios::beg);
+    int y;
+    cout << endl << endl << "Failaa kontents: ";
+    for (int i = 0; i < n2; i++)
+    {
+        f2.read((char*)&y, sizeof(int));
+        cout << y << " ";
+    }
+
+    cout << endl << "Papildinaats fails tika nolasiits!";
+    f2.close();
+
+    return 0;
+}
