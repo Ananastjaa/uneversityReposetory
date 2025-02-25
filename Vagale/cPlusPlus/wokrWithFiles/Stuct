@@ -1,0 +1,117 @@
+#include <iostream>
+#include <cstdlib>
+#include <string>
+
+using namespace std;
+
+struct cat
+{
+	int birthYear;
+	double weight;
+	string name;
+	string color;
+	bool isMael;
+};
+
+void setCat(cat& c)
+{
+	cout << endl << "dimsanas gads: ";
+	cin >> c.birthYear;
+
+	cout << endl << "krasa: ";
+	cin >> c.color;
+
+	cout << endl << "vards: ";
+	cin >> c.name;
+
+	cout << endl << "svars: ";
+	cin >> c.weight;
+
+	cout << endl << "ir kakis: ";
+	cin >> c.isMael;
+}
+
+void setCat3(cat& c, double i)
+{
+	c.birthYear = 2024;
+	c.color = "melns";
+	c.name = "Tom";
+	c.weight = i;
+	c.isMael = true;
+}
+
+void setCat2(cat *c)
+{
+	cout << endl << "dimsanas gads: ";
+	cin >> c->birthYear;
+
+	cout << endl << "krasa: ";
+	cin >> c->color;
+
+	cout << endl << "vards: ";
+	cin >> c->name;
+
+	cout << endl << "svars: ";
+	cin >> c->weight;
+
+	cout << endl << "ir kakis: ";
+	cin >> c->isMael;
+}
+
+void printCat(cat& c)
+{
+	cout << endl << endl << "Kakis " << c.name
+		<< endl << "dimsanas gads: " << c.birthYear
+		<< endl << "krasa: " << c.color
+		<< endl << "svars: " << c.weight
+		<< endl << "ir kakis: " << c.isMael;
+}
+
+int main(int argc, char** argv) {
+	cat catArr[100];
+	int n;
+
+	cout << "kaku skait: ";
+	cin >> n;
+
+	for (int i = 0; i < n; i++)
+	{
+		cat newCat;
+		setCat3(newCat, i+1);
+		catArr[i] = newCat;
+	}
+
+	for (int i = 0; i < n; i++)
+	{
+		printCat(catArr[i]);
+	}
+}
+
+
+
+
+//----NAMESPACES--------------------------------------
+// #include <iostream>
+//#include <cstdlib>
+//#include <string>
+// 
+//using namespace std;
+//
+//namespace today
+//{
+//	int x = 25;
+//}
+//
+//namespace tomorrow
+//{
+//	int x = 30;
+//}
+//
+//int main(int argc, char** argv) {
+//	int x = 1;
+//
+//	cout << "main x: " << x << endl;
+//	cout << "today x: " << today::x << endl;
+//	cout << "tomorrow x: " << tomorrow::x << endl;
+//	cout << "again main x: " << x << endl;
+//}
