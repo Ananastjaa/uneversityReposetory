@@ -1,0 +1,92 @@
+#include <iostream>
+
+using namespace std;
+const int N = 50;
+
+void selectSort(int arr[], int n);
+int getMinElIndex(int arr[], int i, int n);
+void insertSort(int arr[], int n);
+void printArray(int arr[], int n);
+
+int main()
+{
+    int arr[N];
+    int n;
+
+    cout << "Ievadi masiva izmeru: ";
+    cin >> n;
+
+    for (int i = 0; i < n; i++)
+    {
+        cout << "Iavadi masiva " << i + 1 << ". elementu: ";
+        cin >> arr[i];
+    }
+
+    cout << "Masivs: ";
+    printArray(arr, n);
+    cout << endl;
+
+    insertSort(arr, n);
+
+    cout << endl << "Sakartots masivs: ";
+    printArray(arr, n);
+
+    return 0;
+}
+
+void selectSort(int arr[], int n)
+{
+    int minElIndex = 0;
+    int temp;
+    for (int i = 0; i < n - 1; i++)
+    {
+        minElIndex = getMinElIndex(arr, i, n);
+        if (minElIndex != i)
+        {
+            temp = arr[i];
+            arr[i] = arr[minElIndex];
+            arr[minElIndex] = temp;
+        }
+        printArray(arr, n);
+    }
+}
+
+int getMinElIndex(int arr[], int i, int n)
+{
+    int min = i;
+    for (i + 1; i < n; i++)
+    {
+        if (arr[min] > arr[i]) min = i;
+    }
+    return min;
+}
+
+void insertSort(int arr[], int n)
+{
+    int j, temp;
+    bool changed = true;
+    for (int i = 1; i < n; i++) 
+    {
+        changed = true;
+        for (j = i; j > 0 && changed; j--)
+        {
+            if (arr[j] < arr[j - 1])
+            {
+                temp = arr[j];
+                arr[j] = arr[j - 1];
+                arr[j - 1] = temp;
+            }
+            else changed = false;
+            printArray(arr, n);
+        }
+    }
+}
+
+void printArray(int arr[], int n)
+{
+    cout << endl;
+    for (int i = 0; i < n; i++)
+    {
+        cout << arr[i] << " ";
+    }
+}
