@@ -1,16 +1,16 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
+#include <fstream>
 
 using namespace std;
 
 struct cat
 {
 	int birthYear;
-	double weight;
+	double height;
 	string name;
-	string color;
-	bool isMael;
+	string breed;
 };
 
 void setCat(cat& c)
@@ -19,72 +19,148 @@ void setCat(cat& c)
 	cin >> c.birthYear;
 
 	cout << endl << "krasa: ";
-	cin >> c.color;
+	cin >> c.breed;
 
 	cout << endl << "vards: ";
 	cin >> c.name;
 
 	cout << endl << "svars: ";
-	cin >> c.weight;
-
-	cout << endl << "ir kakis: ";
-	cin >> c.isMael;
+	cin >> c.height;
 }
 
-void setCat3(cat& c, double i)
+void setCat3(cat& c, int i)
 {
 	c.birthYear = 2024;
-	c.color = "melns";
-	c.name = "Tom";
-	c.weight = i;
-	c.isMael = true;
+	c.breed = "melns";
+	c.name = "Tom" + to_string(i);
+	c.height = i*10.2;
 }
 
-void setCat2(cat *c)
+void setCat2(cat* c)
 {
 	cout << endl << "dimsanas gads: ";
 	cin >> c->birthYear;
 
 	cout << endl << "krasa: ";
-	cin >> c->color;
+	cin >> c->breed;
 
 	cout << endl << "vards: ";
 	cin >> c->name;
 
 	cout << endl << "svars: ";
-	cin >> c->weight;
-
-	cout << endl << "ir kakis: ";
-	cin >> c->isMael;
+	cin >> c->height;
 }
 
 void printCat(cat& c)
 {
 	cout << endl << endl << "Kakis " << c.name
 		<< endl << "dimsanas gads: " << c.birthYear
-		<< endl << "krasa: " << c.color
-		<< endl << "svars: " << c.weight
-		<< endl << "ir kakis: " << c.isMael;
+		<< endl << "krasa: " << c.breed
+		<< endl << "svars: " << c.height;
+}
+
+void writeToFiles(cat& c)
+{
+	ofstream fileWriterTXT, fileWriterBIN;
+	string line;
+
+	fileWriterTXT.open("kakiTXT.txt", ios :: app);
+	fileWriterBIN.open("kakiBIN.txt", ios :: app);
+
+	if (!fileWriterBIN) { cerr << endl << "Nevareeja atveert failu!"; }
+	else fileWriterBIN.write((char*)&c, sizeof(cat));
+	
+	if (!fileWriterTXT) { cerr << endl << "Nevareeja atveert failu!"; }
+	else
+	{
+		line = c.name + " " + c.breed + " " + to_string(c.height).substr(0, to_string(c.height).find('.')  + 3) + " " + to_string(c.birthYear);
+		fileWriterTXT << line;
+		fileWriterTXT << "\n";
+	}
+
+	fileWriterBIN.close();
+	fileWriterTXT.close();
+}
+
+void readFromFiles()
+{
+	ifstream fileReaderTXT, fileReaderBIN;
+	int n = 0;
+	string line;
+	cat c;
+
+	fileReaderTXT.open("kakiTXT.txt");
+	fileReaderBIN.open("kakiBIN.txt");
+
+	if (!fileReaderBIN) { cerr << endl << "Nevareeja atveert failu!"; }
+	else
+	{
+		fileReaderBIN.seekg(0, ios::end); //aizgājām līdz faila beigām
+		n = fileReaderBIN.tellg() / sizeof(cat); //skaitļu skaits failā
+		cout << endl << "BIN failaa ir " << n << " kaki";
+		fileReaderBIN.seekg(0, ios::beg);
+		cout << endl << "BIN faila kontents:";
+		for (int i = 0; i < n; i++)
+		{
+			fileReaderBIN.read((char*)&c, sizeof(cat));
+			printCat(c);
+		}
+	}
+
+	if (!fileReaderTXT) { cerr << endl << "Nevareeja atveert failu!"; }
+	else
+	{
+		cout <<endl << "---------------------------------------------------";
+		cout << endl << endl << "TXT faila kontents:" << endl;
+		while(!fileReaderTXT.eof())
+		{
+			getline(fileReaderTXT, line);
+			cout << line << endl;
+		}
+	}
+
+	fileReaderBIN.close();
+	fileReaderTXT.close();
+}
+
+void clearFiles()
+{
+	ofstream fileWriterTXT, fileWriterBIN;
+	string line;
+
+	fileWriterTXT.open("kakiTXT.txt");
+	fileWriterBIN.open("kakiBIN.txt");
+
+	fileWriterBIN.clear();
+	fileWriterTXT.clear();
+
+	fileWriterBIN.close();
+	fileWriterTXT.close();
 }
 
 int main(int argc, char** argv) {
 	cat catArr[100];
 	int n;
 
-	cout << "kaku skait: ";
+	cout << "kaku skaits: ";
 	cin >> n;
 
 	for (int i = 0; i < n; i++)
 	{
 		cat newCat;
-		setCat3(newCat, i+1);
+		setCat3(newCat, i + 1);
 		catArr[i] = newCat;
 	}
 
+	clearFiles();
 	for (int i = 0; i < n; i++)
 	{
-		printCat(catArr[i]);
+		writeToFiles(catArr[i]);
 	}
+	cout << "Faili ir aizpildiiti!" << endl;
+	cout << "---------------------------------------------------" << endl;
+
+	readFromFiles();
 }
 
 
