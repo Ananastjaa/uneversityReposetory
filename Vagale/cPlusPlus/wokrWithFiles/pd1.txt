@@ -33,6 +33,15 @@ void Task1()
 		cout << place << ": " << peopleCountStr << endl;
 	}
 
+	//alternative (Vagale)
+	/*char novads[100], iedzSkaits[100];
+	while (!fReader.fail() && !fReader.eof())
+	{
+		fReader.getline(novads, 100, ',');
+		fReader.getline(iedzSkaits, 100, '\n');
+		cout << novads << ": " << iedzSkaits << endl;
+	}*/
+
 	fReader.close();
 }
 
