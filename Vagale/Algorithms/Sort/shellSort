@@ -1,0 +1,103 @@
+#include <iostream>
+
+using namespace std;
+const int N = 50;
+
+void shellSort(int arr[], int n);
+void miniInsertSort(int arr[], int i, int step, int n);
+void printArray(int arr[], int n);
+void printArrayCh(int arr[], int n, int i1, int i2);
+
+
+int main()
+{
+    setlocale(LC_ALL, "en_US.UTF-8");
+    
+    srand(time(NULL));
+    int arr[N];
+    int n;
+
+    cout << "Ievadi masiva izmeru: ";
+    cin >> n;
+
+    for (int i = 0; i < n; i++)
+    {
+        arr[i] =  rand() % 20;
+        //cout << "Iavadi masiva " << i + 1 << ". elementu: ";
+        //cin >> arr[i];
+    }
+
+    cout << "Masivs: ";
+    printArray(arr, n);
+    cout << endl;
+
+    shellSort(arr, n);
+
+    cout << endl << endl << "Sakartots masivs: ";
+    printArray(arr, n);
+
+    return 0;
+}
+
+void shellSort(int arr[], int n)
+{
+    int step, power = 0, i, k;
+    while (pow(2, power) <= n/2)
+    {
+        power++;
+    }
+    power--;
+    step = pow(2, power);
+
+    for (step; step > 0; step /= 2)
+    {
+        cout << endl << endl << "step: " << step << endl;
+        for (k = 0; k < step; k++)
+        {
+            for (i = k; i < n - step; i += step)
+            {
+                if (arr[i + step] < arr[i]) miniInsertSort(arr, i + step, step, n);
+                else printArray(arr, n);
+            }
+        }
+    }
+}
+
+void miniInsertSort(int arr[], int i, int step, int n)
+{
+    int temp;
+    bool changed = true;
+    changed = true;
+    for (i; i > 0+step-1 && changed; i -= step)
+    {
+        if (arr[i] < arr[i - step])
+        {
+            temp = arr[i];
+            arr[i] = arr[i - step];
+            arr[i - step] = temp;
+            printArrayCh(arr, n, i, i - step);
+        }
+        else changed = false;
+    }
+}
+
+
+
+void printArrayCh(int arr[], int n, int i1 , int i2)
+{
+    cout << endl;
+    for (int i = 0; i < n; i++)
+    {
+        if(i == i1 || i ==i2) cout << "-" << arr[i] << "- ";
+        else cout << arr[i] << " ";
+    }
+}
+
+void printArray(int arr[], int n)
+{
+    cout << endl;
+    for (int i = 0; i < n; i++)
+    {
+        cout << arr[i] << " ";
+    }
+}
