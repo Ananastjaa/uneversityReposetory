@@ -13,7 +13,7 @@ struct cat
 	string breed;
 };
 
-void setCat(cat& c)
+void setCatFromConsole(cat& c)
 {
 	cout << endl << "dimsanas gads: ";
 	cin >> c.birthYear;
@@ -28,27 +28,12 @@ void setCat(cat& c)
 	cin >> c.height;
 }
 
-void setCat3(cat& c, int i)
+void setCat(cat& c, int i)
 {
 	c.birthYear = 2024;
 	c.breed = "melns";
 	c.name = "Tom" + to_string(i);
-	c.height = i*10.2;
-}
-
-void setCat2(cat* c)
-{
-	cout << endl << "dimsanas gads: ";
-	cin >> c->birthYear;
-
-	cout << endl << "krasa: ";
-	cin >> c->breed;
-
-	cout << endl << "vards: ";
-	cin >> c->name;
-
-	cout << endl << "svars: ";
-	cin >> c->height;
+	c.height = 5 + i*0.25;
 }
 
 void printCat(cat& c)
@@ -65,7 +50,7 @@ void writeToFiles(cat& c)
 	string line;
 
 	fileWriterTXT.open("kakiTXT.txt", ios :: app);
-	fileWriterBIN.open("kakiBIN.txt", ios :: app);
+	fileWriterBIN.open("kakiBIN.bin", ios :: binary | ios :: app);
 
 	if (!fileWriterBIN) { cerr << endl << "Nevareeja atveert failu!"; }
 	else fileWriterBIN.write((char*)&c, sizeof(cat));
@@ -74,8 +59,7 @@ void writeToFiles(cat& c)
 	else
 	{
 		line = c.name + " " + c.breed + " " + to_string(c.height).substr(0, to_string(c.height).find('.')  + 3) + " " + to_string(c.birthYear);
-		fileWriterTXT << line;
-		fileWriterTXT << "\n";
+		fileWriterTXT << line << "\n";
 	}
 
 	fileWriterBIN.close();
@@ -90,13 +74,13 @@ void readFromFiles()
 	cat c;
 
 	fileReaderTXT.open("kakiTXT.txt");
-	fileReaderBIN.open("kakiBIN.txt");
+	fileReaderBIN.open("kakiBIN.bin", ios::binary);
 
 	if (!fileReaderBIN) { cerr << endl << "Nevareeja atveert failu!"; }
 	else
 	{
-		fileReaderBIN.seekg(0, ios::end); //aizgājām līdz faila beigām
-		n = fileReaderBIN.tellg() / sizeof(cat); //skaitļu skaits failā
+		fileReaderBIN.seekg(0, ios::end);
+		n = fileReaderBIN.tellg() / sizeof(cat);
 		cout << endl << "BIN failaa ir " << n << " kaki";
 		fileReaderBIN.seekg(0, ios::beg);
 		cout << endl << "BIN faila kontents:";
@@ -129,7 +113,7 @@ void clearFiles()
 	string line;
 
 	fileWriterTXT.open("kakiTXT.txt");
-	fileWriterBIN.open("kakiBIN.txt");
+	fileWriterBIN.open("kakiBIN.bin", ios :: binary);
 
 	fileWriterBIN.clear();
 	fileWriterTXT.clear();
@@ -137,6 +121,30 @@ void clearFiles()
 	fileWriterBIN.close();
 	fileWriterTXT.close();
 }
+
+int getCatCount()
+{
+	int recordCount = 0;
+	string line;
+
+	ifstream fileReaderTXT;
+
+	fileReaderTXT.open("kakiTXT.txt");
+
+	if (!fileReaderTXT) { cerr << endl << "Nevareeja atveert failu!"; }
+	else
+	{
+		while (!fileReaderTXT.eof())
+		{
+			getline(fileReaderTXT, line);
+			if(line != "") recordCount++;
+		}
+	}
+
+	fileReaderTXT.close();
+	return recordCount;
+}
+
 
 int main(int argc, char** argv) {
 	cat catArr[100];
