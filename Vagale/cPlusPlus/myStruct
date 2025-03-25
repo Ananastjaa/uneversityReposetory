@@ -1,0 +1,476 @@
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <sstream>
+
+using namespace std;
+
+const string txtFilePath = "klubiTXT.txt";
+const string binFilePath = "klubiBIN.bin";
+
+const int MAX_NAME_LENGTH = 80;
+const int MAX_MEETING_PLACE_LENGTH = 100;
+
+
+struct club
+{
+	char name[MAX_NAME_LENGTH];
+	char meetengPlace[MAX_MEETING_PLACE_LENGTH];
+	int memberCount;
+	int foundingYear;
+	float budget;
+};
+
+void setClubFromConsole(club& c);
+void printClub(club& c);
+void writeToFiles(club& c);
+void writeToTXTFile(club& c);
+void writeToBINFile(club& c);
+void readFromFiles();
+void readFromTXT();
+void readFromBIN();
+void readClubsFromArray(club arr[], int n);
+void clearFiles();
+int getClubCount();
+int findClubsByPlace(string place, club arr[], int n, club clubsFound[]);
+bool isSorted(string word1, string word2);
+void sortClubArrayByName(club arr[], int n);
+void sortClubArrayByMemberCount(club arr[], int n);
+void updateFileContent(club arr[], int n);
+void fillClubArray(club arr[]);
+void appendToBaseFails(club newArr[], int n, club baseArr[], int& baseN);
+void getTask(int& choice);
+void createNewArray(club baseClubArr[], int& baseN);
+bool askToAppendToBaseFaile();
+bool askToSaveClubToFile();
+void work(int choice, int& n, club clubArr[], club findedClubs[], string place, int findedClubCount);
+
+int main() {
+	string place = "";
+	club clubArr[40], findedClubs[40];
+	int choice = 0;
+	int n = 0, findedClubCount = 0;
+
+
+	n = getClubCount(); // dabuuju klubu skaitu no faila;
+	fillClubArray(clubArr);  // izlasiju klubus no bin faila, ieliku masiivaa;
+	cout << "Visi klubi tika nolasiti no failiem un salikti pamata masiva, ar kuru turpmak stradasi. Klubu skaits: " << n;
+
+
+	while (choice != -1)
+	{
+		getTask(choice);
+		work(choice, n, clubArr, findedClubs, place, findedClubCount);
+	}
+}
+
+void setClubFromConsole(club& c)
+{
+	char buffer[100];
+
+	cout << endl << "nosaukums: ";
+	cin.ignore();
+	cin.getline(buffer, MAX_NAME_LENGTH);
+	strcpy_s(c.name, buffer);
+
+
+	cout << endl << "sapulcu vieta: ";
+	cin.getline(buffer, MAX_MEETING_PLACE_LENGTH);
+	strcpy_s(c.meetengPlace, buffer);
+
+	cout << endl << "dalibnieku skaits : ";
+	cin >> c.memberCount;
+	
+	cout << endl << "dibinasanas gads : ";
+	cin >> c.foundingYear;
+
+	cout << endl << "budzets: ";
+	cin >> c.budget;
+}
+
+void printClub(club& c)
+{
+	cout << endl << endl << "Nosaukums: " << c.name
+		<< endl << "sapulcu vieta: " << c.meetengPlace
+		<< endl << "dalibnieku skaits: " << c.memberCount
+		<< endl << "dibinasanas gads: " << c.foundingYear
+		<< endl << "budzets: " << c.budget;
+}
+
+void writeToFiles(club& c)
+{
+	writeToTXTFile(c);
+	writeToBINFile(c);
+}
+
+void writeToTXTFile(club& c)
+{
+	ofstream fileWriterTXT;
+	string line;
+
+	fileWriterTXT.open(txtFilePath, ios::app);
+
+	if (!fileWriterTXT) { cerr << endl << "Nevareeja atveert failu!"; }
+	else
+	{
+		line = string(c.name) + ", " + string(c.meetengPlace) + ", " + to_string(c.memberCount) + ", " + to_string(c.foundingYear) + ", " + to_string(c.budget);
+		fileWriterTXT << line << "\n";
+	}
+
+	fileWriterTXT.close();
+}
+
+void writeToBINFile(club& c)
+{
+	ofstream fileWriterBIN;
+
+	fileWriterBIN.open(binFilePath, ios::binary | ios::app);
+
+	if (!fileWriterBIN) { cerr << endl << "Nevareeja atveert failu!"; }
+	else fileWriterBIN.write((char*)&c, sizeof(club));
+
+	fileWriterBIN.close();
+}
+
+void readFromFiles()
+{
+	readFromTXT();
+	readFromBIN();
+}
+
+void readFromTXT() 
+{
+	ifstream fileReaderTXT;
+	string line;
+
+	fileReaderTXT.open(txtFilePath);
+
+	if (!fileReaderTXT) { cerr << endl << "Nevareeja atveert failu!"; }
+	else
+	{
+		cout << endl << endl << "TXT faila kontents:" << endl;
+		while (!fileReaderTXT.eof())
+		{
+			getline(fileReaderTXT, line);
+			cout << line << endl;
+		}
+	}
+
+	fileReaderTXT.close();
+}
+
+void readFromBIN() 
+{
+	ifstream fileReaderBIN;
+	int n = 0;
+	club c;
+
+	fileReaderBIN.open(binFilePath, ios::binary);
+
+	if (!fileReaderBIN) { cerr << endl << "Nevareeja atveert failu!"; }
+	else
+	{
+		fileReaderBIN.seekg(0, ios::end);
+		n = fileReaderBIN.tellg() / sizeof(club);
+		cout << endl << "BIN failaa ir " << n << " klubi";
+		fileReaderBIN.seekg(0, ios::beg);
+		cout << endl << "BIN faila kontents:";
+		for (int i = 0; i < n; i++)
+		{
+			fileReaderBIN.read((char*)&c, sizeof(club));
+			printClub(c);
+		}
+	}
+
+	fileReaderBIN.close();
+}
+
+void readClubsFromArray(club arr[], int n)
+{
+	cout << "Izvada klubus no maasiiva: " << endl;
+	for (int i = 0; i < n; i++)
+	{
+		printClub(arr[i]);
+	}
+}
+
+void clearFiles()
+{
+	ofstream fileWriterTXT, fileWriterBIN;
+	string line;
+
+	fileWriterTXT.open(txtFilePath);
+	fileWriterBIN.open(binFilePath, ios::binary);
+
+	fileWriterBIN.clear();
+	fileWriterTXT.clear();
+
+	fileWriterBIN.close();
+	fileWriterTXT.close();
+}
+
+int getClubCount()
+{
+	int recordCount = 0;
+	string line;
+
+	ifstream fileReaderTXT;
+
+	fileReaderTXT.open(txtFilePath);
+
+	if (!fileReaderTXT) { cerr << endl << "Nevareeja atveert failu!"; }
+	else
+	{
+		while (!fileReaderTXT.eof())
+		{
+			getline(fileReaderTXT, line);
+			if (line != "") recordCount++;
+		}
+	}
+
+	fileReaderTXT.close();
+	return recordCount;
+}
+
+int findClubsByPlace(string place, club arr[], int n, club clubsFound[])
+{
+	int count = 0;
+
+	for (int i = 0; i < n; i++)
+	{
+		if (arr[i].meetengPlace == place)
+		{
+			clubsFound[count] = arr[i];
+			count++;
+		}
+	}
+
+	return count;
+}
+
+bool isSorted(string word1, string word2)
+{
+	if (word1 == word2) return true;
+
+	int minLen = word1.length() < word2.length() ? word1.length() : word2.length();
+	int i = 0;
+
+	while (i < minLen)
+	{
+		if (tolower(word1[i]) > tolower(word2[i])) return false;
+		if (tolower(word1[i]) != tolower(word2[i])) return true;
+		i++;
+	}
+
+	return word1.length() <= word2.length();
+}
+
+void sortClubArrayByName(club arr[], int n)
+{
+	//insert sort
+	int count = 0, j;
+	club temp;
+
+	for (int i = 1; i < n; i++)
+	{
+		for (j = i; j > 0; j--)
+		{
+			if (!isSorted(arr[j - 1].name, arr[j].name))
+			{
+				temp = arr[j];
+				arr[j] = arr[j - 1];
+				arr[j - 1] = temp;
+			}
+		}
+	}
+}
+
+void sortClubArrayByMemberCount(club arr[], int n)
+{
+	//insert sort
+	int count = 0, j;
+	club temp;
+
+	for (int i = 1; i < n; i++)
+	{
+		for (j = i; j > 0; j--)
+		{
+			if (arr[j].memberCount < arr[j - 1].memberCount)
+			{
+				temp = arr[j];
+				arr[j] = arr[j - 1];
+				arr[j - 1] = temp;
+			}
+		}
+	}
+}
+
+void updateFileContent(club arr[], int n)
+{
+	clearFiles();
+
+	for (int i = 0; i < n; i++)
+	{
+		writeToFiles(arr[i]);
+	}
+}
+
+void fillClubArray(club arr[])
+{
+	ifstream fileReaderBIN;
+	int n = 0;
+	club c;
+
+	fileReaderBIN.open(binFilePath, ios::binary);
+
+	if (!fileReaderBIN) { cerr << endl << "Nevareeja atveert bin failu, lain no taa nalasiitu klubus!"; }
+	else
+	{
+		fileReaderBIN.seekg(0, ios::end);
+		n = fileReaderBIN.tellg() / sizeof(club);
+		fileReaderBIN.seekg(0, ios::beg);
+		for (int i = 0; i < n; i++)
+		{
+			fileReaderBIN.read((char*)&c, sizeof(club));
+			arr[i] = c;
+		}
+	}
+
+	fileReaderBIN.close();
+}
+
+void appendToBaseFails(club newArr[], int n, club baseArr[], int& baseN)
+{
+	for (int i = 0; i < n; i++)
+	{
+		baseArr[baseN] = newArr[i];
+		baseN++;
+
+		writeToFiles(newArr[i]);
+	}
+}
+
+void work(int choice, int& n, club clubArr[], club findedClubs[], string place, int findedClubCount)
+{
+	switch (choice)
+	{
+	case 0:
+		club c;
+		setClubFromConsole(c);
+		clubArr[n] = c;
+		n++;
+		cout << endl << "JAUNS KLUBS IZVEIDOTS";
+		if (askToSaveClubToFile())
+		{
+			writeToFiles(c);
+			cout << endl << "JAUNS KLUBS SAGLABATS TXT UN BIN FAILOS";
+		}
+		break;
+	case 1:
+		createNewArray(clubArr, n);
+		break;
+	case 2:
+		for (int i = 0; i < n; i++) printClub(clubArr[i]);
+		break;
+	case 3:
+		readFromTXT();
+		break;
+	case 4:
+		readFromBIN();
+		break;
+	case 5:
+		cout << "Ievadi vietu, pec kuras meklesi klubus: ";
+		cin.ignore();
+		getline(cin, place);
+		findedClubCount = findClubsByPlace(place, clubArr, n, findedClubs);
+		cout << "atrastu klubu skaits: " << findedClubCount;
+		for (int i = 0; i < findedClubCount; i++) printClub(findedClubs[i]);
+		break;
+	case 6:
+		sortClubArrayByName(clubArr, n);
+		cout << endl << "MASIVS SAKARTOTS";
+		break;
+	case 7:
+		sortClubArrayByMemberCount(clubArr, n);
+		cout << endl << "MASIVS SAKARTOTS";
+		break;
+	case 8:
+		updateFileContent(clubArr, n);
+		cout << endl << "TXT UN BIN FAILI ATJANOTI";
+		break;
+	case 9:
+		cout << "KLUBU SKAITS: " << getClubCount();
+		break;
+	case 10:
+		clearFiles();
+		for (int i = 0; i < n; i++) clubArr[i] = {};
+		n = 0;
+		cout << endl << "FAILI UN PAMATA MASIVS IZTIRITI";
+		break;
+	default:
+		break;
+	}
+}
+
+void getTask(int& choice)
+{
+	cout << endl << "---------------------------------------------------";
+	cout << endl << "izveidot jaunu klubu, un pievienot, to pamata masivam - 0";
+	cout << endl << "izveidot jaunu klubu masiivu - 1";
+	cout << endl << "nolasiit klubus no pamata masiiva - 2";
+	cout << endl << "nolasiit klubus no txt faila - 3";
+	cout << endl << "nolasiit klubus no bin faila - 4";
+	cout << endl << "atrast klubus peec norises vietas - 5";
+	cout << endl << "sakaartot pamata klubu masiivu peec kluba nosaukuma - 6";
+	cout << endl << "sakaartot pamata klubu masiivu peec dalibnieku skaita - 7";
+	cout << endl << "atjaunot failus, saglabajot tajos klubus no masiiva - 8";
+	cout << endl << "izvadit klubu skaitu FAILOS - 9";
+	cout << endl << "dzest visu no pamata masiiva, txt un bin failiem - 10";
+	cout << endl << "beigt darbu - -1";
+
+	cout << endl << endl << "ko daram? ";
+	cin >> choice;
+}
+
+void createNewArray(club baseClubArr[], int& baseN)
+{
+	club newClubArr[50];
+	int n;
+
+	cout << "klubu skaits: ";
+	cin >> n;
+
+	for (int i = 0; i < n; i++)
+	{
+		cout << "-------------------KLUB-" << i + 1 << "---------------------------";
+		club newClub;
+		setClubFromConsole(newClub);
+		newClubArr[i] = newClub;
+	}
+
+	cout << endl << "JAUNS KLUBU MASIVS IZVEIDOTS";
+
+	if (askToAppendToBaseFaile())
+	{
+		appendToBaseFails(newClubArr, n, baseClubArr, baseN);
+		cout << endl << "JAUNI KLUBI PIEVIENOTI PAMATA MASIVAM UN SAGLABATI FAILOS";
+	}
+}
+
+bool askToAppendToBaseFaile()
+{
+	int result;
+
+	cout << endl << "Pievienot so masiivu pamata masiivam un failiem? \n <!!!ja tu to nepievienosi, to zaudesi so masivu, jo talak stradasi ar pamata masivu un failiem> (pievienot - 1)";
+	cin >> result;
+	return result == 1;
+}
+
+bool askToSaveClubToFile()
+{
+	int result;
+
+	cout << endl << "Saglbat jaunu klubu failos? (jaa - 1)";
+	cin >> result;
+	return result == 1;
+}
