@@ -1,0 +1,106 @@
+// https://www.google.com/search?sca_esv=7d1b82273738a5db&udm=7&sxsrf=AHTn8zrDrMACHnlX8p-JnIlH5cFzUmSBUg:1742898091781&q=quick+sort+animation&sa=X&ved=2ahUKEwiKuo-tgaWMAxXbFRAIHU2JNpkQ8ccDKAJ6BAgQEAQ&biw=1552&bih=750&dpr=1.65#fpstate=ive&vld=cid:e00e37e8,vid:8hEyhs3OV1w,st:0
+
+#include <iostream>
+
+using namespace std;
+const int N = 50;
+
+void quickSort(int arr[], int n);
+void printArrayCh(int arr[], int n, int i1, int i2, int focus);
+void printArray(int arr[], int n);
+void findAndChange(int arr[], int left, int right, int n);
+
+int main()
+{
+    setlocale(LC_ALL, "en_US.UTF-8");
+    
+    srand(time(NULL));
+    int arr[N];
+    int n;
+
+    cout << "Ievadi masiva izmeru: ";
+    cin >> n;
+
+    for (int i = 0; i < n; i++)
+    {
+        arr[i] =  rand() % 20;
+    }
+
+    cout << "Masivs: ";
+    printArray(arr, n);
+    cout << endl;
+
+    quickSort(arr, n);
+    cout << endl << endl << "Sakartots masivs: ";
+    printArray(arr, n);
+
+    return 0;
+}
+
+
+void printArrayCh(int arr[], int n, int i1 , int i2, int focus)
+{
+    cout << endl;
+    for (int i = 0; i < n; i++)
+    {
+        if (i == focus && (i == i1 || i == i2)) cout << "(-" << arr[i] << "-) ";
+        else if (i == focus)  cout << "(" << arr[i] << ") ";
+        else if (i == i1 || i == i2) cout << "-" << arr[i] << "- ";
+        else cout << arr[i] << " ";
+    }
+}
+
+
+void quickSort(int arr[], int n)
+{
+    int left = 0, right = n - 1;
+
+    findAndChange(arr, left, right, n);
+}
+
+// n ir vajadzigs tikai sorteesanas procesa attelosanai
+void findAndChange(int arr[], int left, int right, int n)
+{
+    int temp;
+
+    if (left >= right) return; 
+
+    int focus = (left + right) / 2;
+    int pivot = arr[focus];
+    int i = left, j = right;
+
+    while (i <= j) {
+        while (arr[i] < pivot) i++;
+        while (arr[j] > pivot) j--;
+
+        if (i <= j) {
+            if (arr[i] != arr[j])
+            {
+                printArrayCh(arr, n, i, j, focus);
+
+                //maina masiva elementus vietaam
+                temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+
+                // seko fokusa pozicijai, tikai un vienigi skaistai un skaidraj attelosanai
+                if (focus == i) focus = j;
+                else if (focus == j) focus = i;
+            }
+            i++;
+            j--;
+        }
+    }
+
+    findAndChange(arr, left, j, n);
+    findAndChange(arr, i, right, n);
+
+}
+
+void printArray(int arr[], int n) {
+    cout << endl;
+    for (int i = 0; i < n; i++)
+    {
+        cout << arr[i] << " ";
+    }
+}
