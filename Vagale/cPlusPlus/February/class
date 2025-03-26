@@ -1,0 +1,103 @@
+#include <iostream>
+#include <string>
+
+// MD KLASE PIEMERS 5  (otraa prezentaacija)       TIMER
+
+
+const int Size = 100;
+
+using namespace std;
+
+class MyClass {
+private:
+	int a;
+
+public: 
+	MyClass() 
+	{ 
+		cout << "\nConstructor executed"; 
+		a = 25;
+	}
+
+	~MyClass() { 
+		cout << "\nDestructor executed"; 
+		delete& a;
+	}
+
+	void set_a(int num) { a = num; }
+	int get_a() { return a; }
+};
+
+class Steks
+{
+	string st[Size]; //steka saturs
+	int vir; //steka virsotnes indeks
+public:
+	Steks(); // konstriktora inicalizacija
+	void init(); //steka inicializaacija
+	void push(string ch); //simbola ievietošana stekaa
+	string pop(); //simbola izņemšana no steka
+	int getSize();
+};
+
+void Steks::init()
+{
+	vir = 0;
+}
+
+void Steks::push(string ch)
+{
+	if (vir == Size) {
+		cout << "Steks pilns";
+		return;
+	}
+	st[vir] = ch;
+	vir++;
+}
+
+Steks::Steks()
+{
+	vir = 0;
+}
+
+string Steks::pop()
+{
+	if (vir == 0) {
+		cout << "Steks tukss"; 
+		return 0;
+	}
+	vir--;
+	return st[vir];
+}
+
+int Steks::getSize()
+{
+	return vir;
+}
+
+int main() {
+	int i, max;
+	Steks s1, s2;
+	char sym = 'A';
+	s1.init(); s2.init();
+
+	for (int i = 0; i < 33; i++)
+	{
+		s1.push(to_string(i));
+		s2.push(to_string(sym));
+		sym++;
+	}
+
+	cout << "Steka s1 elementi:\n";
+	max = s1.getSize();
+	for (i = 0; i < max; i++)
+		cout << s1.pop() << " "; 
+	cout << "\n";
+	cout << "Steka s2 elementi:\n";
+	max = s2.getSize();
+	for (i = 0; i < max; i++)
+		cout << s2.pop() << " "; 
+	cout << "\n";
+	system("Pause");
+	return 0;
+}
