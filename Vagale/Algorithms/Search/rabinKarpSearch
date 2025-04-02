@@ -1,0 +1,45 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+int rabinKarpSearch(string& text, string& pattern) {
+    int textLength = text.length();
+    int patternLength = pattern.length();
+    int textHash = 0, patternHash = 0;
+    int i, j;
+
+    if (textLength < patternLength) return -1;
+
+    for (i = 0; i < patternLength; i++) {
+        patternHash += pattern[i];
+        textHash += text[i];
+    }
+
+    for (i = 0; i <= textLength - patternLength; i++) {
+        if (patternHash == textHash) {
+            for (j = 0; j < patternLength && text[i + j] == pattern[j]; j++);
+            if (j == patternLength) return i;
+        }
+
+        if (i < textLength - patternLength) textHash = textHash - text[i] + text[i + patternLength];
+    }
+    return -1;
+}
+
+int main() {
+    string text, pattern;
+
+    cout << "Ievadi tekstu: ";
+    getline(cin, text);
+
+    cout << "Ievadiet meklejamo paraugu: ";
+    getline(cin, pattern);
+
+    int position = rabinKarpSearch(text, pattern);
+
+    if (position != -1)  cout << "Paraugs atrasts pozicijaa: " << position << endl;
+    else cout << "Paraugs tekstaa nav atrasts." << endl;
+
+    return 0;
+}
