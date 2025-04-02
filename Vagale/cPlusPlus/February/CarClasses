@@ -1,0 +1,77 @@
+#include <iostream>
+#include <string>
+
+// MD KLASE PIEMERS 5  (otraa prezentaacija)       TIMER
+
+const int Size = 100;
+
+using namespace std;
+
+class SuperCar;
+
+class MiniCar {
+private:
+	int speed;
+	int mas;
+
+public:
+	friend int getSpeedDiff(MiniCar& minC, SuperCar& superC);
+	void setCar(int speed, int mas);
+	bool isMiniCarFaster(SuperCar& superC);
+
+	MiniCar()
+	{
+		cout << "\nConstructor executed\n";
+	}
+
+	~MiniCar() {
+		cout << "\n\nDestructor executed\n";
+	}
+};
+
+class SuperCar {
+private:
+	int speed;
+	int mas;
+
+public:
+	friend int getSpeedDiff(MiniCar& minC, SuperCar& superC);
+	friend bool MiniCar::isMiniCarFaster(SuperCar& superC);
+	void setCar(int speed, int mas);
+	SuperCar()
+	{
+		cout << "\nConstructor executed\n";
+
+	}
+
+	~SuperCar() {
+		cout << "\n\nDestructor executed\n";
+	}
+};
+
+void SuperCar::setCar(int speed, int mas) { this->speed = speed; this->mas = mas; }
+void MiniCar::setCar(int speed, int mas) { this->speed = speed; this->mas = mas; }
+
+int getSpeedDiff(MiniCar& minC, SuperCar& superC)
+{
+	return minC.speed - superC.speed;
+}
+
+bool MiniCar::isMiniCarFaster(SuperCar& superC)
+{
+	return this->speed - superC.speed;
+}
+
+int main() {
+	MiniCar car1;
+	SuperCar car2;
+	car1.setCar(200, 1500);
+	car2.setCar(120, 4500);
+
+	if (getSpeedDiff(car1, car2) > 0) cout << "mini car if faster";
+	else if (getSpeedDiff(car1, car2) < 0) cout << "super car if faster";
+	else cout << "car speeds are equal";
+	cout << car1.isMiniCarFaster(car2);
+
+	return 0;
+}
