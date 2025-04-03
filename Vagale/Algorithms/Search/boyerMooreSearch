@@ -1,0 +1,52 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+int boyerMooreSearch(const string& text, const string& pattern) {
+    int textLength = text.length();
+    int patternLength = pattern.length();
+    int i, j, offset = 1;
+
+    if (textLength < patternLength) return -1;
+
+    for (i = patternLength - 1; i <= textLength - patternLength; i+= offset) {
+        cout << "check: ";
+        for (int k = patternLength - 1; k >= 0; k--)
+        {
+            cout << text[i - k];
+        }
+        cout << endl;
+
+        if (text[i] == pattern[patternLength - 1])
+        {
+            for (j = 1; j < patternLength && text[i - j] == pattern[patternLength - j -1]; j++);
+            if (j == patternLength) return i - patternLength;
+        }
+        for (j = 1; j < patternLength && pattern[patternLength - j - 1] != text[i]; j++);
+        offset = j;
+    }
+    return -1;
+}
+
+int main() {
+    string text, pattern;
+
+    cout << "Ievadiet tekstu: ";
+    getline(cin, text);
+
+    cout << "Ievadiet meklejamo paraugu: ";
+    getline(cin, pattern);
+
+    int position = boyerMooreSearch(text, pattern);
+
+    if (position != -1) {
+        cout << "Paraugs atrasts pozicija: " << position << endl;
+        for (int i = 0; i < pattern.length(); i++) cout << text[position + i];
+    }
+    else {
+        cout << "Paraugs teksta nav atrasts." << endl;
+    }
+
+    return 0;
+}
