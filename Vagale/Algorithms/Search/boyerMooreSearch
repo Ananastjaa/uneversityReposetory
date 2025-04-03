@@ -10,7 +10,7 @@ int boyerMooreSearch(const string& text, const string& pattern) {
 
     if (textLength < patternLength) return -1;
 
-    for (i = patternLength - 1; i <= textLength - patternLength; i+= offset) {
+    for (i = patternLength - 1; i <= textLength; i+= offset) {
         cout << "check: ";
         for (int k = patternLength - 1; k >= 0; k--)
         {
@@ -21,7 +21,7 @@ int boyerMooreSearch(const string& text, const string& pattern) {
         if (text[i] == pattern[patternLength - 1])
         {
             for (j = 1; j < patternLength && text[i - j] == pattern[patternLength - j -1]; j++);
-            if (j == patternLength) return i - patternLength;
+            if (j == patternLength) return i - patternLength + 1;
         }
         for (j = 1; j < patternLength && pattern[patternLength - j - 1] != text[i]; j++);
         offset = j;
