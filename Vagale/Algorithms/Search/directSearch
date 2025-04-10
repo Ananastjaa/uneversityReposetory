@@ -16,7 +16,7 @@ int directSearch(string& text, string& pattern) {
 }
 
 int main() {
-    cout << "Autors: Anastasija Kzika\nProgramma: Bouera_Muura algoritms\n\n";
+    cout << "Autors: Anastasija Kzika\nProgramma: Naivaas meklesanas algoritms\n\n";
     string text, pattern;
 
     cout << "Ievadi tekstu: ";
