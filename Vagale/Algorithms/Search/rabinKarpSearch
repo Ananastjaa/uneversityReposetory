@@ -28,7 +28,7 @@ int rabinKarpSearch(string& text, string& pattern) {
 }
 
 int main() {
-     cout << "Autors: Anastasija Kzika\nProgramma: Bouera_Muura algoritms\n\n";
+     cout << "Autors: Anastasija Kzika\nProgramma: Rabina_Karpa algoritms\n\n";
     
     string text, pattern;
 
