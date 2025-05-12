@@ -1,0 +1,153 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+// generic classes ---------------------------------------------------
+template <class tips> class list
+{
+    tips data;
+    list* next;
+public:
+    list(tips d);
+    void add(list* last)
+    {
+        last->next = this;
+    }
+    list* getnext() { 
+        return next; 
+    }
+    tips getdata() { return data; }
+};
+
+template <class tips> list<tips>::list(tips d)
+{
+    data = d; next = 0;
+}
+
+int main() {
+    list<char> start('a');
+    list<char>* p, * last;
+    int i;
+
+    //izveid sarakstu
+    last = &start;
+    for (i = 1;i < 26;i++) {
+        p = new list<char>('a' + i);
+        p->add(last);
+        last = p;
+    }
+
+    //saraksta izvads
+    p = &start;
+    while (p) {
+        cout << " " << p->getdata() << " ";
+        p = p->getnext();
+    }
+
+    // tas pats ar int -------------------------------------
+
+    list<int> start2(0);
+    list<int>* num, * last2;
+
+    last2 = &start2;
+    for (i = 1;i < 26;i++) {
+        num = new list<int>(0 + i);
+        num->add(last2);
+        last2 = num;
+    }
+
+    num = &start2;
+    cout << endl;
+    while (num) {
+        cout << " " << num->getdata() << " ";
+        num = num->getnext();
+    }
+
+    // tas pats ar string ---------------------------------------
+
+    list<string> start3("uzvards");
+    list<string>* str, * last3;
+
+    last3 = &start3;
+    for (i = 1;i < 15;i++) {
+        str = new list<string>("uzvards" + to_string(i));
+        str->add(last3);
+        last3 = str;
+    }
+
+    str = &start3;
+    cout << endl;
+    while (str) {
+        cout << " " << str->getdata() << " ";
+        str = str->getnext();
+    }
+
+    return 0;
+}
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+// 
+// 
+// //#include <iostream>
+//#include <string>
+//
+//using namespace std;
+//
+//// paarslogosana (overloading) ---------------------------------
+////int square(int x) { 
+////    cout << endl << "INT";
+////    return x * x; 
+////}
+////double square(double y) { 
+////    cout << endl << "DOUBLE";
+////    return y * y; 
+////}
+//
+//// sabloni --------------------------------------------------------
+////template <class TT>
+////
+////TT maximal(TT a, TT b)
+////{
+////    if (a > b) return a;
+////    else return b;
+////}
+//
+//// generic classes ---------------------------------------------------
+//template <class tips1, class tips2> 
+//class myclass
+//{
+//    tips1 x;
+//    tips2 y;
+//public:
+//    myclass(tips1 a, tips2 b);
+//    void show();
+//};
+//
+//template <class tips1, class tips2>
+//myclass<tips1, tips2> :: myclass(tips1 a, tips2 b) {
+//    x = a; y = b;
+//}
+//
+//template <class tips1, class tips2>
+//void myclass<tips1, tips2> :: show() { cout << x << ' ' << y << '\n'; }
+//
+//int main() {
+//    myclass<int, double> ob1(10, 0.23);
+//    myclass<char, const char*> ob2('a', "Tas ir tests");
+//    myclass<float, bool> ob3(1.25, false);
+//    ob1.show();
+//    ob2.show();
+//    ob3.show();
+//    int i;
+//    return 0;
+//}
