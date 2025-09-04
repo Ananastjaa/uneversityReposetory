@@ -1,0 +1,670 @@
+#include <iostream>
+#include <cstring>
+#include <fstream>
+
+using namespace std;
+
+const int N = 100;
+const int MAX_STRING_LEN = 100;
+
+const char UserNameTxtFilePath[] = "userName.txt";
+const char SportClubBinFilePath[] = "sportasKlubiBin.bin";
+const char HobbyClubBinFilePath[] = "hobbiKlubiBIN.bin";
+
+char globalUserName[MAX_STRING_LEN];
+char line[MAX_STRING_LEN];
+
+// class for hobby type enum and it's converter
+class HobbyType {
+public:
+	enum Hobby {
+		art,
+		craft,
+		cooking,
+		other
+	};
+
+	static const char* toString(Hobby hobby) {
+		switch (hobby) {
+		case art:     return "maksla";
+		case craft:   return "rokdarbi";
+		case cooking: return "kulinarija";
+		case other:   return "cits";
+		default:      return "cits";
+		}
+	}
+};
+
+// parent class
+class Club {
+protected:
+	int memberCount;
+	char name[MAX_STRING_LEN];
+
+public:
+	Club(const char* name, int memberCount) {
+		strncpy_s(this->name, name, MAX_STRING_LEN);
+		this->memberCount = memberCount;
+	}
+
+	Club() {
+		name[0] = '\0';
+		memberCount = 0;
+	}
+
+	int getMemberCount() { return memberCount; }
+
+	const char* getName() { return name; }
+};
+
+// child class 1
+class SportClub : public Club {
+private:
+	char sport[MAX_STRING_LEN];
+	int rank;
+	bool isTeamSport;
+
+public:
+	SportClub(const char* sport, int rank, bool isTeamSport, const char* name, int memberCount)
+		: Club(name, memberCount) {
+		strncpy_s(this->sport, sport, MAX_STRING_LEN);
+		this->rank = rank;
+		this->isTeamSport = isTeamSport;
+	}
+
+	SportClub() {}
+
+	void printClubInfo() {
+		cout << "\nKluba nosaukums: " << name;
+		cout << "\ndalibnieku skaits: " << memberCount;
+		cout << "\nsporta veids: " << sport;
+		cout << "\nkomandas sporta veids: " << (isTeamSport ? "ja" : "ne");
+		cout << "\nvieta turnira tabulaa: " << rank << endl << endl;
+	}
+
+	const char* getSport() { return sport; }
+};
+
+// child class 2
+class HobbyClub : public Club {
+private:
+	char hobbyName[MAX_STRING_LEN];
+	HobbyType::Hobby hobbyType;
+	bool isIndoor;
+
+public:
+	HobbyClub(const char* hobby, HobbyType::Hobby hobbyType, bool isIndoor, const char* name, int memberCount)
+		: Club(name, memberCount) {
+		strncpy_s(this->hobbyName, hobby, MAX_STRING_LEN);
+		this->hobbyType = hobbyType;
+		this->isIndoor = isIndoor;
+	}
+
+	HobbyClub() {}
+
+	void printClubInfo() {
+		cout << "\nKluba nosaukums: " << name;
+		cout << "\ndalibnieku skaits: " << memberCount;
+		cout << "\nhobbijs: " << hobbyName;
+		cout << "\nhobbi veids: " << HobbyType::toString(hobbyType);
+		cout << "\nsanaksmes notiek telpaa: " << (isIndoor ? "ja" : "ne") << endl << endl;
+	}
+
+	HobbyType::Hobby getHobbyType() { return hobbyType; }
+};
+
+// FILE FUNCTIONS -------------------------------------------------------------------
+
+void rewriteClubsFromArraysToFile(SportClub array[], int count)
+{
+	ofstream fileWriter;
+
+	fileWriter.open(SportClubBinFilePath, ios::binary);
+
+	for (int i = 0; i < count; i++) {
+		fileWriter.write((char*)&array[i], sizeof(SportClub));
+	}
+
+	fileWriter.close();
+
+	cout << "\n--- Sport klubu fails tika atjaunots  ---\n";
+}
+
+void rewriteClubsFromArraysToFile(HobbyClub array[], int count)
+{
+	ofstream fileWriter;
+
+	fileWriter.open(HobbyClubBinFilePath, ios::binary);
+
+	for (int i = 0; i < count; i++) {
+		fileWriter.write((char*)&array[i], sizeof(HobbyClub));
+	}
+
+	fileWriter.close();
+
+	cout << "\n--- Hobbi klubu fails tika atjaunots  ---\n";
+}
+
+void writeClubToFile(SportClub& c)
+{
+	ofstream fileWriter;
+
+	fileWriter.open(SportClubBinFilePath, ios::app, ios::binary);
+
+	if (!fileWriter) { cerr << endl << "Nevareeja atveert failu!"; }
+	else fileWriter.write((char*)&c, sizeof(SportClub));
+
+	fileWriter.close();
+
+	cout << "\n--- Sport klubs tika ierakstits (pievienots) failaa  ---\n";
+}
+
+void writeClubToFile(HobbyClub& c)
+{
+	ofstream fileWriter;
+
+	fileWriter.open(HobbyClubBinFilePath, ios::app, ios::binary);
+
+	if (!fileWriter) { cerr << endl << "Nevareeja atveert failu!"; }
+	else fileWriter.write((char*)&c, sizeof(c));
+
+	fileWriter.close();
+
+	cout << "\n--- Hobbi klubs tika ierakstits (pievienots) failaa  ---\n";
+}
+
+void readSportClubsFromFile() {
+	ifstream fileReader;
+	int n = 0;
+	SportClub c;
+
+	fileReader.open(SportClubBinFilePath, ios::binary);
+
+	if (fileReader)
+	{
+		fileReader.seekg(0, ios::end);
+		n = fileReader.tellg() / sizeof(SportClub);
+		if (n == 0) cout << "\nSporta klubu fails ir Tukshs!\n";
+		else {
+			cout << endl << "Sporta klubu BIN failaa ir " << n << " klubi\n";
+			fileReader.seekg(0, ios::beg);
+			cout << endl << "BIN faila kontents:\n";
+			for (int i = 0; i < n; i++)
+			{
+				fileReader.read((char*)&c, sizeof(SportClub));
+				cout << "\nklubs No " << i + 1;
+				c.printClubInfo();
+			}
+		}
+	}
+
+	fileReader.close();
+}
+
+void readHobbyClubsFromFile() {
+	ifstream fileReader;
+	int n = 0;
+	HobbyClub c;
+
+	fileReader.open(HobbyClubBinFilePath, ios::binary);
+
+	if (fileReader)
+	{
+		fileReader.seekg(0, ios::end);
+		n = fileReader.tellg() / sizeof(HobbyClub);
+		if (n == 0) cout << "\nHobby klubu fails ir Tukshs!\n";
+		else {
+			cout << endl << "Hobby klubu BIN failaa ir " << n << " klubi\n";
+			fileReader.seekg(0, ios::beg);
+			cout << endl << "BIN faila kontents:\n";
+			for (int i = 0; i < n; i++)
+			{
+				fileReader.read((char*)&c, sizeof(HobbyClub));
+				cout << "\nklubs No " << i + 1 << endl;
+				c.printClubInfo();
+			}
+		}
+	}
+
+	fileReader.close();
+}
+
+void setArraysFromFiles(SportClub sportClubs[], HobbyClub hobbyClubs[], int& sportClubCount, int& hobbyClubCount) {
+	sportClubCount = 0;
+	hobbyClubCount = 0;
+	ifstream fileReader;
+	SportClub cSport;
+	HobbyClub cHobby;
+
+	fileReader.open(SportClubBinFilePath, ios::binary);
+
+	if (fileReader)
+	{
+		fileReader.seekg(0, ios::end);
+		int n = fileReader.tellg() / sizeof(SportClub);
+		sportClubCount = n;
+		fileReader.seekg(0, ios::beg);
+		for (int i = 0; i < n; i++)
+		{
+			fileReader.read((char*)&cSport, sizeof(SportClub));
+			sportClubs[i] = cSport;
+		}
+	}
+
+	fileReader.close();
+
+	fileReader.open(HobbyClubBinFilePath, ios::binary);
+
+	if (fileReader.is_open())
+	{
+		fileReader.seekg(0, ios::end);
+		int n = fileReader.tellg() / sizeof(HobbyClub);
+		hobbyClubCount = n;
+		fileReader.seekg(0, ios::beg);
+		for (int i = 0; i < n; i++)
+		{
+			fileReader.read((char*)&cHobby, sizeof(HobbyClub));
+			hobbyClubs[i] = cHobby;
+		}
+		fileReader.close();
+	}
+
+	cout << "\n--- Klubi tika nolasiti no failiem un ielikti masivos ---\n";
+}
+
+void writeUserNameToFile(const char* userName) {
+	ofstream fileWriter(UserNameTxtFilePath);
+	if (!fileWriter) {
+		cerr << "\nNevar atvērt failu!";
+	}
+	else {
+		fileWriter << userName;
+	}
+	fileWriter.close();
+
+	cout << "\n--- Jusu vaards tika saglabaats ---\n";
+}
+
+void getUserNameFromFile(char* userNameOut) {
+	ifstream fileReader(UserNameTxtFilePath);
+	if (fileReader) {
+		fileReader.getline(userNameOut, MAX_STRING_LEN);
+	}
+	fileReader.close();
+}
+
+void checkIfFilesExist()
+{
+	ifstream file(SportClubBinFilePath);
+	if (!file.good()) {
+		ofstream file01;
+		file01.open(SportClubBinFilePath);
+		file01.close();
+		cout << "\n--- Sporta klubu binarais fails tika izveidots! ---\n";
+	}
+
+	ifstream file2(HobbyClubBinFilePath);
+	if (!file2.good()) {
+		ofstream file02;
+		file02.open(HobbyClubBinFilePath);
+		file02.close();
+
+		cout << "\n--- Hobbi klubu binarais fails tika izveidots! ---\n";
+	}
+}
+
+// OTHER FUNCTIONS ---------------------------------------------------------------------
+
+void waitForKey() {
+	cout << "\nNospied ENTER, lai turpinatu... ";
+	cin.ignore();
+	cin.getline(line, MAX_STRING_LEN);
+}
+
+SportClub getNewSportClub() {
+	char name[MAX_STRING_LEN];
+	char sport[MAX_STRING_LEN];
+	int memberCount, rank;
+	bool isTeamSport;
+
+
+	cout << "\nIevadi kluba sporta nosaukumu: ";
+	cin.ignore();
+	cin.getline(name, MAX_STRING_LEN);
+	cout << "\nIevadi dalibnieku skaitu: ";
+	cin >> memberCount;
+	cout << "\nIevadi sporta veidu: ";
+	cin.ignore();
+	cin.getline(sport, MAX_STRING_LEN);
+	cout << "\nIevadi kluba ranku (vietu turnira tabulaa): ";
+	cin >> rank;
+	cout << "\nVai tas ir komandas sporta veids (ja - 1, ne - 0)? Ievadi ciparu: ";
+	cin >> isTeamSport;
+
+	cout << "\n--- Jauns sporta klubs tika izveidot un ielikts masivaa ---\n";
+	return SportClub(sport, rank, isTeamSport, name, memberCount);
+}
+
+HobbyClub getNewHobbyClub() {
+	char name[MAX_STRING_LEN], hobby[MAX_STRING_LEN];
+	int memberCount;
+	bool isIndoor;
+	HobbyType::Hobby hobbyType;
+	int hobbyTypeIndex;
+
+	cout << "\nIevadi hobbi kluba nosaukumu: ";
+	cin.ignore();
+	cin.getline(name, MAX_STRING_LEN);
+	cout << "\nIevadi dalibnieku skaitu: ";
+	cin >> memberCount;
+	cout << "\nIevadi hobbiju: ";
+	cin.ignore();
+	cin.getline(hobby, MAX_STRING_LEN);
+	cout << "\nIevadi hobbi veidu (maksla - 0, rokdarbi - 1, kulinarija - 2, cits - 3). Ievadi ciparu: ";
+	cin >> hobbyTypeIndex;
+
+	switch (hobbyTypeIndex) {
+	case 0: hobbyType = HobbyType::Hobby::art; break;
+	case 1: hobbyType = HobbyType::Hobby::cooking; break;
+	case 2: hobbyType = HobbyType::Hobby::craft; break;
+	case 3: hobbyType = HobbyType::Hobby::other; break;
+	default: hobbyType = HobbyType::Hobby::other; break;
+	}
+
+	cout << "\nVai sanaksmes notiek telpaa (ja - 1, ne - 0)? Ievadi ciparu: ";
+	cin >> isIndoor;
+
+	cout << "\n--- Jauns hobby klubs tika izveidot un ielikts masivaa ---\n";
+	return HobbyClub(hobby, hobbyType, isIndoor, name, memberCount);
+}
+
+void createClub(SportClub sportClubs[], HobbyClub hobbyClubs[], int& sportClubCount, int& hobbyClubCount) {
+	int choice;
+
+	cout << "Kadu klubu velies izveidot? (sporta klubu (1) vai hobbi klubu (2)) Ievadi ciparu: ";
+	cin >> choice;
+
+	if (choice == 1) {
+		SportClub newClub = getNewSportClub();
+		sportClubs[sportClubCount] = newClub;
+		writeClubToFile(newClub);
+		sportClubCount++;
+	}
+	else if (choice == 2) {
+		HobbyClub newClub = getNewHobbyClub();
+		hobbyClubs[hobbyClubCount] = newClub;
+		writeClubToFile(newClub);
+		hobbyClubCount++;
+	}
+	else {
+		cout << "wrong input";
+	}
+}
+
+void printArray(SportClub array[], int count) {
+	if (count == 0) cout << "\nMasivs ir tulkshs!\n";
+	else cout << "\nSPORTA KLUBU MASIVS:\n\n";
+
+	for (int i = 0; i < count; i++)
+	{
+		cout << "klubs No" << i + 1;
+		array[i].printClubInfo();
+	}
+}
+
+void printArray(HobbyClub array[], int count) {
+	if (count == 0) cout << "\nMasivs ir tulkshs!\n";
+	else cout << "\nHOBBI KLUBU MASIVS:\n\n";
+
+	for (int i = 0; i < count; i++)
+	{
+		cout << "klubs No" << i + 1;
+		array[i].printClubInfo();
+	}
+}
+
+void printClubCount(int countSport, int countHobby) {
+	cout << "\nRegistraa ir " << countSport << " sporta klubi";
+	cout << "\nRegistraa ir " << countHobby << " hobbi klub\n";
+}
+
+bool areLinesEqual(const char line1[], char line2[], int len)
+{
+	for (int i = 0; i < len && line1[i] == line2[i]; i++)
+	{
+		if (line1[i] != '\0' && len && line2[i] != '\0') return true;
+	}
+
+	return false;
+}
+
+void selectClubsBySport(SportClub arr[], int count) {
+	char sport[MAX_STRING_LEN];
+	bool isFound = false;
+	cout << "\nIevadi sporta veidu, peec kura atlasi klubus: ";
+	cin.ignore();
+	cin.getline(sport, MAX_STRING_LEN);
+
+	for (int i = 0; i < count; i++) {
+		if (areLinesEqual(arr[i].getSport(), sport, MAX_STRING_LEN)) {
+			if (!isFound) cout << "\nKlubi ar sporta veidu - " << sport << ":\n\n";
+			isFound = true;
+			arr[i].printClubInfo();
+		}
+	}
+
+	if (!isFound) cout << "\nTadu klubu nav!\n";
+}
+
+void selectClubsByHobbyType(HobbyClub arr[], int count) {
+	HobbyType::Hobby hobbyType;
+	int hobbyIndex;
+	bool isFound = false;
+	cout << "\nIevadi hobbi veidu ((maksla - 0, rokdarbi - 1, kulinarija - 2, cits - 3)), peec kura atlasi klubus. Ievadi ciparu: ";
+	cin >> hobbyIndex;
+
+	switch (hobbyIndex) {
+	case 0: hobbyType = HobbyType::Hobby::art; break;
+	case 1: hobbyType = HobbyType::Hobby::cooking; break;
+	case 2: hobbyType = HobbyType::Hobby::craft; break;
+	case 3: hobbyType = HobbyType::Hobby::other; break;
+	default: hobbyType = HobbyType::Hobby::other; break;
+	}
+
+	for (int i = 0; i < count; i++) {
+		if (arr[i].getHobbyType() == hobbyType) {
+			if (!isFound) cout << "\nKlubi ar hobbi veidu - " << HobbyType::toString(hobbyType) << ":\n\n";
+			isFound = true;
+			arr[i].printClubInfo();
+		}
+	}
+
+	if (!isFound) cout << "\nTadu klubu nav!\n";
+}
+
+void bubbleSortSportClubsArray(SportClub array[], int size) {
+	for (int i = 0; i < size - 1; ++i) {
+		for (int j = 0; j < size - i - 1; ++j) {
+			if (array[j].getMemberCount() > array[j + 1].getMemberCount()) {
+				SportClub temp = array[j];
+				array[j] = array[j + 1];
+				array[j + 1] = temp;
+			}
+		}
+	}
+}
+
+void bubbleSortHobbyClubsArray(HobbyClub array[], int size) {
+	for (int i = 0; i < size - 1; ++i) {
+		for (int j = 0; j < size - i - 1; ++j) {
+			if (array[j].getMemberCount() > array[j + 1].getMemberCount()) {
+				HobbyClub temp = array[j];
+				array[j] = array[j + 1];
+				array[j + 1] = temp;
+			}
+		}
+	}
+}
+
+void setUserName() {
+	cout << "\nIevadi vaardu: ";
+	cin.ignore();
+	cin.getline(globalUserName, MAX_STRING_LEN);
+	writeUserNameToFile(globalUserName);
+}
+
+void sortClubs(SportClub arraySport[], int countSport, HobbyClub arrayHobby[], int countHobby) {
+	int choice;
+	cout << "\nIzvelies kurus klubus sakartot (tika sporta klubus - 1, tikai hobbi klubus - 2, visus klubus - 3) Ievadi ciparu: ";
+	cin >> choice;
+
+	switch (choice)
+	{
+	case 1:
+		bubbleSortSportClubsArray(arraySport, countSport);
+		cout << "\n--- Sporta klubi tika sakatoti pec dalibnieku skaita ---\n";
+		rewriteClubsFromArraysToFile(arraySport, countSport);
+		break;
+	case 2:
+		bubbleSortHobbyClubsArray(arrayHobby, countHobby);
+		cout << "\n--- Hobbi klubi tika sakatoti pec dalibnieku skaita ---\n";
+		rewriteClubsFromArraysToFile(arrayHobby, countHobby);
+		break;
+	case 3:
+		bubbleSortSportClubsArray(arraySport, countSport);
+		bubbleSortHobbyClubsArray(arrayHobby, countHobby);
+		cout << "\n--- Klubi tika sakatoti pec dalibnieku skaita ---\n";
+		rewriteClubsFromArraysToFile(arraySport, countSport);
+		rewriteClubsFromArraysToFile(arrayHobby, countHobby);
+		break;
+	default:
+		break;
+	}
+}
+
+// MENU (COORDINATOR) FUNCTION ------------------------------------------------------------------------------------------
+
+void askWhatToDo(SportClub sportClubs[], HobbyClub hobbyClubs[], int& sportClubCount, int& hobbyClubCount)
+{
+	int action;
+
+	cout << "\n---------------------------------------------------------------\n";
+	cout << "\n" << globalUserName << ", izvelies darbibu : ";
+	cout << "\n1 - izveidot jaunu klubu";
+	cout << "\n2 - izvadit sporta klubu masivu";
+	cout << "\n3 - izvadit hobbi klubu masivu";
+	cout << "\n4 - izvadit klubu skaitus";
+	cout << "\n5 - izvadit sporta klubu faila saturu";
+	cout << "\n6 - izvadit hobbi klubu faila saturu";
+	cout << "\n7 - sakartot masivu pec dalibnieku skaita";
+	cout << "\n8 - atlasit sporta klubus pec sporta veida";
+	cout << "\n9 - atlasit hobbi klubus pec hobbi veida";
+	cout << "\n10 - mainiit lietotaja vardu";
+	cout << "\n11 - beigt darbu\n\n";
+	cout << "darbiba: ";
+
+	cin >> action;
+
+	switch (action) {
+	case 1:
+		cout << "\n----------------------------------------------------\n";
+		createClub(sportClubs, hobbyClubs, sportClubCount, hobbyClubCount);
+		cout << "\n----------------------------------------------------\n";
+		waitForKey();
+		break;
+	case 2:
+		cout << "\n----------------------------------------------------\n";
+		printArray(sportClubs, sportClubCount);
+		cout << "\n----------------------------------------------------\n";
+		waitForKey();
+		break;
+	case 3:
+		cout << "\n----------------------------------------------------\n";
+		printArray(hobbyClubs, hobbyClubCount);
+		cout << "\n----------------------------------------------------\n";
+		waitForKey();
+		break;
+	case 4:
+		cout << "\n----------------------------------------------------\n";
+		printClubCount(sportClubCount, hobbyClubCount);
+		cout << "\n----------------------------------------------------\n";
+		waitForKey();
+		break;
+	case 5:
+		cout << "\n----------------------------------------------------\n";
+		readSportClubsFromFile();
+		cout << "\n----------------------------------------------------\n";
+		waitForKey();
+		break;
+	case 6:
+		cout << "\n----------------------------------------------------\n";
+		readHobbyClubsFromFile();
+		cout << "\n----------------------------------------------------\n";
+		waitForKey();
+		break;
+	case 7:
+		cout << "\n----------------------------------------------------\n";
+		sortClubs(sportClubs, sportClubCount, hobbyClubs, hobbyClubCount);
+		cout << "\n----------------------------------------------------\n";
+		waitForKey();
+		break;
+	case 8:
+		cout << "\n----------------------------------------------------\n";
+		selectClubsBySport(sportClubs, sportClubCount);
+		cout << "\n----------------------------------------------------\n";
+		waitForKey();
+		break;
+	case 9:
+		cout << "\n----------------------------------------------------\n";
+		selectClubsByHobbyType(hobbyClubs, hobbyClubCount);
+		cout << "\n----------------------------------------------------\n";
+		waitForKey();
+		break;
+	case 10:
+		cout << "\n----------------------------------------------------\n";
+		setUserName();
+		cout << "\n----------------------------------------------------\n";
+		waitForKey();
+		break;
+	case 11:
+		exit(0);
+		break;
+	default:
+		cout << "\nNepareizs ievads.\n";
+		break;
+	}
+}
+
+// MAIN -----------------------------------------------------------------------------------------------
+
+int main() {
+	cout << "\nAutors: Anastasija Kizika, IT 1. kurss";
+	cout << "\nProgrammas nosaukums: 2. majas darbs";
+	cout << "\nProgramma tika ievests: Klases, mantosana, faili, parsllogosana, kartosanas algoritms (bubble sort)\n\n";
+
+	SportClub sportClubs[N];
+	HobbyClub hobbyClubs[N];
+
+	int sportClubCount = 0, hobbyClubCount = 0;
+
+	getUserNameFromFile(globalUserName);
+
+	if (strlen(globalUserName) == 0) {
+		cout << "\nIevadi vaardu: ";
+		cin.getline(globalUserName, MAX_STRING_LEN);
+		writeUserNameToFile(globalUserName);
+	}
+
+	cout << "\nHi, " << globalUserName << "! Sveicinaati tavaa klubu registraa.\n";
+
+	checkIfFilesExist();
+	setArraysFromFiles(sportClubs, hobbyClubs, sportClubCount, hobbyClubCount);
+
+	printClubCount(sportClubCount, hobbyClubCount);
+
+	while (true) {
+		askWhatToDo(sportClubs, hobbyClubs, sportClubCount, hobbyClubCount);
+	}
+
+	return 0;
+}
