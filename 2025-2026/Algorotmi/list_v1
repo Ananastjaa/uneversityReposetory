@@ -1,0 +1,496 @@
+#include <iostream>
+#include <cstring>
+
+using namespace std;
+
+const int MAX_STR_LEN = 100;
+char line[MAX_STR_LEN];
+
+class Node
+{
+public:
+    int value;
+    Node* next;
+
+    Node(int value) {
+        this->value = value;
+        next = NULL;
+    }
+};
+
+void deleteElementByIndex(Node* cursor, Node* prev, int index)
+{
+    Node* next = cursor->next;
+    delete cursor;
+
+    prev->next = next;
+    cout << "Element (pec indeksa " << index << ") dzests\n";
+}
+
+class MyList
+{
+public:
+    Node* first;
+
+    MyList() {
+        first = NULL;
+    }
+
+    ~MyList() {
+        Node* cursor = first;
+        while (cursor != NULL) {
+            Node* temp = cursor;
+            cursor = cursor->next;
+            delete temp;
+        }
+
+        cout << "\n  LIST DZESTS ------------------\n";
+    }
+
+    void printList() {
+        if (first == NULL)
+        {
+            cout << "\nList ir tukss!\n";
+            return;
+        }
+
+        Node* cursor = first;
+
+        cout << "\n-------------LIST-----------------\n";
+        cout << cursor->value << " ";
+        while (cursor->next != NULL)
+        {
+            cout << cursor->next->value << " ";
+            cursor = cursor->next;
+        }
+        cout << "\n-------------LIST-----------------\n";
+    }
+
+    void addFirst(int val)
+    {
+        Node* newNode = new Node(val);
+
+        if (first == NULL) first = newNode;
+        else
+        {
+            Node* second = first;
+            first = newNode;
+            first->next = second;
+        }
+
+        cout << "\n" << val << "  ELEMENTS PIEVIENOTS (pirmais) ------------------\n";
+    }
+
+    void addLast(int val)
+    {
+        Node* newNode = new Node(val);
+
+        if (first == NULL) first = newNode;
+        else {
+            Node* cursor = first;
+
+            while (cursor->next != NULL) cursor = cursor->next;
+            cursor->next = newNode;
+        }
+
+        cout << "\n" << val << "  ELEMENTS PIEVIENOTS (pedejais) ------------------\n";
+    }
+
+    void addNextTo(int element)
+    {
+        int newVal;
+        Node* cursor;
+
+        if (first == NULL) {
+            cout << "List ir tukss\n";
+        }
+        else
+        {
+            cursor = first;
+
+            while (cursor->value != NULL && cursor->next != NULL) {
+                cursor = cursor->next;
+            }
+            if (cursor->value != element)
+            {
+                cout << "\nIevadi jaunu elemntu: \n";
+                cin >> newVal;
+                Node* newNode = new Node(newVal);
+                newNode->next = cursor->next;
+                cursor->next = newNode;
+                cout << "\n" << newVal << "  elements (pec elemnta " << element << ") pievienots\n";
+            }
+            else {
+                cout << "\n!!!Tada elementa nav!!!\n";
+            }
+        }
+    }
+
+    void addBefore(int element)
+    {
+        int newVal;
+        Node* prev;
+
+        if (first == NULL) {
+            cout << "List ir tuks\n";
+            return;
+        }
+        else if (first->value == element)
+        {
+            cout << "\nIevadi jaunu elemntu: \n";
+            cin >> newVal;
+            addFirst(newVal);
+            cout << "\n" << newVal << "  elements (pirms elementa " << element << ") pievienots\n";
+        }
+        else
+        {
+            prev = first;
+            while (prev->next != NULL && prev->next->value != element)
+            {
+                prev = prev->next;
+            }
+            if (prev->next != NULL && prev->next->value == element)
+            {
+                cout << "\nIevadi jaunu elemntu: \n";
+                cin >> newVal;
+                Node* newNode = new Node(newVal);
+                newNode->next = prev->next;
+                prev->next = newNode;
+                cout << "\n" << newVal << "  elements (pirms indeksa " << element << ") pievienots\n";
+            }
+            else {
+                cout << "\n!!!Tada elementa nav!!!\n";
+            }
+
+            /*if (element == 0) {
+                Node* newNode = new Node(val);
+                newNode->next = first;
+                first = newNode;
+                cout << "\n" << val << "  elements (pirms indeksa " << element << ") pievienots\n";
+            }
+            else
+            {
+                prev = first;
+                cursor = first->next;
+
+                for (i = 1; i < element && cursor != NULL; i++) {
+                    prev = cursor;
+                    cursor = cursor->next;
+                }
+                if (i == element)
+                {
+                    Node* newNode = new Node(val);
+                    newNode->next = cursor;
+                    prev->next = newNode;
+                    cout << "\n" << val << "  elements (pirms indeksa " << element << ") pievienots\n";
+                }
+            }*/
+        }
+    }
+
+    void removeByIndex(int index)
+    {
+        Node* prev = NULL;
+        Node* cursor = first;
+        int i;
+
+        if (first == NULL) {
+            cout << "List ir tukss\n";
+            return;
+        }
+        else
+        {
+            if (index == 0)
+            {
+                Node* next = first->next;
+                delete first;
+                first = next;
+                cout << "Elements (pec indeksa " << index << ") dzests\n";
+            }
+            else {
+                prev = cursor;
+                cursor = cursor->next;
+
+                for (i = 1; i < index && cursor != NULL; i++)
+                {
+                    prev = cursor;
+                    cursor = cursor->next;
+                }
+                if (cursor != NULL) {
+                    deleteElementByIndex(cursor, prev, index);
+                }
+                else cout << "Tads indekss neeksiste\n";
+            }
+        }
+    }
+
+    void removeFirst()
+    {
+        if (first == NULL) {
+            cout << "List ir tukss\n";
+            return;
+        }
+        else
+        {
+            Node* next = first->next;
+            delete first;
+            first = next;
+            cout << "Pirmais elements dzests\n";
+        }
+    }
+
+    void removeLast()
+    {
+        if (first == NULL) {
+            cout << "List ir tukss\n";
+            return;
+        }
+        else
+        {
+            if (first->next == NULL)
+            {
+                delete first;
+                first = NULL;
+                cout << "Pedejais elements dzests\n";
+            }
+            else
+            {
+                Node* prev = first;
+                Node* cursor = first->next;
+
+                while (cursor->next != NULL)
+                {
+                    prev = cursor;
+                    cursor = cursor->next;
+                }
+
+                prev->next = NULL;
+                delete cursor;
+                cout << "Pedejais elements dzests\n";
+            }
+        }
+    }
+
+    void removeBefore(int index)
+    {
+        int count = getCount();
+
+        if (index <= 0) cout << "Nevar dzest elementu pirms " << index << "\n";
+        else if (index > count) cout << "Nevar dzest elementu pirms " << index << ", lista garums ir " << count << "\n";
+        else {
+            removeByIndex(index - 1);
+            cout << "Elements pirms mezgla Nr " << index << " dzests\n";
+        }
+    }
+
+    void removeNetTo(int index)
+    {
+        int count = getCount();
+
+        if (index < 0) cout << "Nevar dzest elementu pec " << index << "\n";
+        else if (index >= count) cout << "Elementa ar indeksa nr " << index << " nav\n";
+        else {
+            removeByIndex(index + 1);
+            cout << "Elements pec mezgla Nr " << index << " dzests\n";
+        }
+    }
+
+    int getCount()
+    {
+        int i = 0;
+        Node* cursor = first;
+
+        while (cursor != NULL) {
+            i++;
+            cursor = cursor->next;
+        }
+
+        return i;
+    }
+
+    int getIndex(int value) {
+        Node* cursor = first;
+        int index = 0;
+
+        while (cursor != NULL) {
+            if (cursor->value == value) return index;
+            index++;
+            cursor = cursor->next;
+        }
+
+        return -1;
+    }
+
+    void removeBeforeValue(int value)
+    {
+        int index = getIndex(value);
+        if (index == -1) {
+            cout << "\nTads elements sarakstaa neeksistee";
+            return;
+        }
+        else removeBefore(index);
+    }
+
+    void removeNextToValue(int value)
+    {
+        int index = getIndex(value);
+        if (index == -1) {
+            cout << "\nTads elements sarakstaa neeksistee";
+            return;
+        }
+        else removeNetTo(index);
+    }
+
+    void addBeforeValue(int value, int newValue)
+    {
+        int index = getIndex(value);
+        if (index == -1) {
+            cout << "\nTads elements sarakstaa neeksistee";
+            return;
+        }
+        else addBefore(newValue, index);
+    }
+
+    void addNextToValue(int value, int newValue)
+    {
+        int index = getIndex(value);
+        if (index == -1) {
+            cout << "\nTads elements sarakstaa neeksistee";
+            return;
+        }
+        else addNextTo(newValue, index);
+    }
+};
+
+void waitForKey() {
+    cout << "\nNospied ENTER, lai turpinatu... ";
+    cin.ignore();
+    cin.getline(line, MAX_STR_LEN);
+}
+
+int main()
+{
+    MyList list1;
+    int choice, val, index;
+
+    cout << "\nAutors: Anastasija Kizika, IT 2. kurss";
+    cout << "\nProgrammas nosaukums: Datu struktura - Vienvirziena saraksts\n\n";
+
+    while (true)
+    {
+        cout << "\n-------------MENU-----------------\n";
+        cout << "1. Izvadit listi\n";
+        cout << "2. Pievienot elementu pirmajā\n";
+        cout << "3. Pievienot elementu pedejā\n";
+        cout << "4. Pievienot elementu pec indeksa\n";
+        cout << "5. Pievienot elementu pirms indeksa\n";
+        cout << "6. Dzest elementu pec indeksa\n";
+        cout << "7. Dzest pirmo elementu\n";
+        cout << "8. Dzest pedejo elementu\n";
+        cout << "9. Dzest elementu pirms indeksa\n";
+        cout << "10. Dzest elementu pec indeksa\n";
+        cout << "11. Dzest elementu pirms elementa\n";
+        cout << "12. Dzest elementu pec elementa\n";
+        cout << "13. Pievienot elementu pec elementa\n";
+        cout << "14. Pievienot elementu pirms elemnta\n";
+        cout << "0. Iziet\n";
+        cout << "Ievadiet jusu izveli: ";
+        cin >> choice;
+
+        switch (choice)
+        {
+        case 1:
+            list1.printList();
+            cout << "Listes garums: " << list1.getCount() << "\n";
+            waitForKey();
+            break;
+        case 2:
+            cout << "Ievadiet vertibu: ";
+            cin >> val;
+            list1.addFirst(val);
+            waitForKey();
+            break;
+        case 3:
+            cout << "Ievadiet vertibu: ";
+            cin >> val;
+            list1.addLast(val);
+            waitForKey();
+            break;
+        case 4:
+            cout << "Ievadiet vertibu: ";
+            cin >> val;
+            cout << "Ievadiet indeksu: ";
+            cin >> index;
+            list1.addNextTo(val, index);
+            waitForKey();
+            break;
+        case 5:
+            cout << "Ievadiet vertibu: ";
+            cin >> val;
+            cout << "Ievadiet indeksu: ";
+            cin >> index;
+            list1.addBefore(val, index);
+            waitForKey();
+            break;
+        case 6:
+            cout << "Ievadiet indeksu: ";
+            cin >> index;
+            list1.removeByIndex(index);
+            waitForKey();
+            break;
+        case 7:
+            list1.removeFirst();
+            waitForKey();
+            break;
+        case 8:
+            list1.removeLast();
+            waitForKey();
+            break;
+        case 9:
+            cout << "Ievadiet indeksu: ";
+            cin >> index;
+            list1.removeBefore(index);
+            waitForKey();
+            break;
+        case 10:
+            cout << "Ievadiet indeksu: ";
+            cin >> index;
+            list1.removeNetTo(index);
+            waitForKey();
+            break;
+        case 11:
+            cout << "Ievadiet elementu: ";
+            cin >> index;
+            list1.removeBeforeValue(index);
+            waitForKey();
+            break;
+        case 12:
+            cout << "Ievadiet elemntu: ";
+            cin >> index;
+            list1.removeNextToValue(index);
+            waitForKey();
+            break;
+        case 13:
+            cout << "Ievadiet jaunu vertibu: ";
+            cin >> val;
+            cout << "Ievadiet lista elementu: ";
+            cin >> index;
+            list1.addNextToValue(index, val);
+            waitForKey();
+            break;
+        case 14:
+            cout << "Ievadiet jaunu vertibu: ";
+            cin >> val;
+            cout << "Ievadiet lista elementu: ";
+            cin >> index;
+            list1.addBeforeValue(index, val);
+            waitForKey();
+            break;
+        case 0:
+            cout << "Iziet...\n";
+            return 0;
+        default:
+            cout << "Nepareiza izvele\n";
+        }
+    }
+}
