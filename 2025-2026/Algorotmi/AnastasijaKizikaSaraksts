@@ -1,11 +1,23 @@
 #include <iostream>
+#include <limits>
 #include <cstring>
 
 using namespace std;
 
-// sis ir vajadziigs waitForKey() funkcijas darbam
+// sis ir vajadzigs waitForKey() funkcijas darbam
 const int MAX_STR_LEN = 100;
 char line[MAX_STR_LEN];
+
+// korektam ievadam
+int getIntInput() {
+    int num;
+    while (true) {
+        if (cin >> num) return num;
+        cout << "Nepareiza ievade! Ludzu ievadiet veselu skaitli: ";
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
+}
 
 class Node
 {
@@ -117,7 +129,7 @@ public:
             if (cursor->value == element)
             {
                 cout << "\nIevadi jaunu elemntu: ";
-                cin >> newVal;
+                newVal = getIntInput();
                 Node* newNode = new Node(newVal);
                 newNode->next = cursor->next;
                 cursor->next = newNode;
@@ -136,13 +148,13 @@ public:
 
         if (first == NULL)
         {
-            cout << "Srakasts ir tukss";
+            cout << "\nSrakasts ir tukss\n";
         }
         else if (first->value == element)
         {
             int value;
             cout << "\nIvadiet jaunu elementu: ";
-            cin >> value;
+            value = getIntInput();
             addFirst(value);
         }
         else {
@@ -156,14 +168,15 @@ public:
             {
                 int value;
                 cout << "\nIvadiet jaunu elementu: ";
-                cin >> value;
-                Node newNode = Node(value);
-                newNode.next = prev->next;
-                prev->next = &newNode;
-                cout << "\nElements veiksmigi pievienots pirms elementa " << element;
+                value = getIntInput();
+                Node* newNode = new Node(value);
+                newNode->next = prev->next;
+                prev->next = newNode;
+                cout << "\nElements veiksmigi pievienots pirms elementa \n" << element;
+                printList();
             }
             else {
-                cout << "Tada elementa nav!!";
+                cout << "\nTada elementa nav!!\n";
             }
         }
     }
@@ -266,7 +279,7 @@ public:
             removeFirst();
         }
         else {
-            while (prev->next!=NULL && prev->next->value != element)
+            while (prev->next != NULL && prev->next->value != element)
             {
                 twoStepsBack = prev;
                 prev = prev->next;
@@ -329,7 +342,7 @@ public:
 
 void waitForKey() {
     cout << "\nNospied ENTER, lai turpinatu... ";
-    cin.ignore();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     cin.getline(line, MAX_STR_LEN);
 }
 
@@ -359,7 +372,7 @@ int main()
         cout << "11. Dzest visu sarakstu\n";
         cout << "0. Iziet\n";
         cout << "Ievadiet jusu izveli: ";
-        cin >> choice;
+        choice = getIntInput();
 
         switch (choice)
         {
@@ -370,32 +383,32 @@ int main()
             break;
         case 2:
             cout << "Ievadiet jaunu elementu: ";
-            cin >> val;
+            val = getIntInput();
             list1.addFirst(val);
             waitForKey();
             break;
         case 3:
             cout << "Ievadiet jaunu elementu: ";
-            cin >> val;
+            val = getIntInput();
             list1.addLast(val);
             waitForKey();
             break;
         case 4:
             list1.printList();
-            if (list1.getCount() != 0) 
+            if (list1.getCount() != 0)
             {
                 cout << "Izvelies elementu: ";
-                cin >> elem;
+                elem = getIntInput();
                 list1.addNextTo(elem);
             }
             waitForKey();
             break;
         case 5:
             list1.printList();
-            if (list1.getCount() != 0) 
+            if (list1.getCount() != 0)
             {
                 cout << "Izvelies elementu: ";
-                cin >> elem;
+                elem = getIntInput();
                 list1.addBefore(elem);
             }
             waitForKey();
@@ -405,7 +418,7 @@ int main()
             if (list1.getCount() != 0)
             {
                 cout << "Izvelies elementu: ";
-                cin >> elem;
+                elem = getIntInput();
                 list1.removeElement(elem);
             }
             waitForKey();
@@ -420,10 +433,10 @@ int main()
             break;
         case 9:
             list1.printList();
-            if (list1.getCount() != 0) 
+            if (list1.getCount() != 0)
             {
                 cout << "Izvelies elementu: ";
-                cin >> elem;
+                elem = getIntInput();
                 list1.removeBefore(elem);
             }
             waitForKey();
@@ -433,7 +446,7 @@ int main()
             if (list1.getCount() != 0)
             {
                 cout << "Izvelies elementu: ";
-                cin >> elem;
+                elem = getIntInput();
                 list1.removeNetTo(elem);
             }
             waitForKey();
