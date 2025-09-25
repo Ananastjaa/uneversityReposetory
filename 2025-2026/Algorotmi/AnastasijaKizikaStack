@@ -1,0 +1,210 @@
+#include <iostream>
+#include <limits>
+#include <cstring>
+
+using namespace std;
+
+// sis ir vajadzigs waitForKey() funkcijas darbam
+const int MAX_STR_LEN = 100;
+char line[MAX_STR_LEN];
+
+// korektam ievadam
+int getIntInput() {
+    int num;
+    while (true) {
+        if (cin >> num) return num;
+        cout << "Nepareiza ievade! Ludzu ievadiet veselu skaitli: ";
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
+}
+
+class Node
+{
+public:
+    int value;
+    Node* next;
+
+    Node(int value) {
+        this->value = value;
+        next = NULL;
+    }
+};
+
+void deleteNotFirstElement(Node* element, Node* prev)
+{
+    Node* next = element->next;
+    delete element;
+
+    prev->next = next;
+    cout << "Elements dzests\n";
+}
+
+class MyStack
+{
+public:
+    Node* first;
+
+    MyStack() {
+        first = NULL;
+    }
+
+    ~MyStack() {
+        Node* cursor = first;
+        while (cursor != NULL) {
+            Node* temp = cursor;
+            cursor = cursor->next;
+            delete temp;
+        }
+
+        cout << "\nSTEKS DZESTS -----------------------\n";
+    }
+
+    void printStack() {
+        if (first == NULL)
+        {
+            cout << "\nSteks ir tukss!\n";
+            return;
+        }
+
+        Node* cursor = first;
+
+        cout << "\n-------------Steks-----------------\n";
+        cout << cursor->value << " ";
+        while (cursor->next != NULL)
+        {
+            cout << cursor->next->value << " ";
+            cursor = cursor->next;
+        }
+        cout << "\n-------------Steks-----------------\n";
+    }
+
+    void add(int val)
+    {
+        Node* newNode = new Node(val);
+
+        if (first == NULL) first = newNode;
+        else {
+            Node* cursor = first;
+
+            while (cursor->next != NULL) cursor = cursor->next;
+            cursor->next = newNode;
+        }
+
+        cout << "\n" << val << " elements veiksmigi pievienots (beigas)\n";
+        printStack();
+    }
+
+    int pop()
+    {
+        int val;
+        if (first == NULL) {
+            cout << "Steks ir tukss\n";
+            return NULL;
+        }
+        else
+        {
+            if (first->next == NULL)
+            {
+                val = first->value;
+                delete first;
+                first = NULL;
+                return val;
+            }
+            else
+            {
+                Node* prev = first;
+                Node* cursor = first->next;
+
+                while (cursor->next != NULL)
+                {
+                    prev = cursor;
+                    cursor = cursor->next;
+                }
+
+                val = cursor->value;
+                prev->next = NULL;
+                delete cursor;
+                printStack();
+                return val;
+            }
+        }
+    }
+
+    int getCount()
+    {
+        int i = 0;
+        Node* cursor = first;
+
+        while (cursor != NULL) {
+            i++;
+            cursor = cursor->next;
+        }
+
+        return i;
+    }
+};
+
+void waitForKey() {
+    cout << "\nNospied ENTER, lai turpinatu... ";
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cin.getline(line, MAX_STR_LEN);
+}
+
+int main()
+{
+    MyStack stack1;
+    int choice, val, elem;
+
+    cout << "\nAutors: Anastasija Kizika, IT 2. kurss";
+    cout << "\nProgrammas nosaukums: Datu struktura - Steks\n\n";
+    waitForKey();
+
+    while (true)
+    {
+        system("cls");
+        cout << "\n-------------MENU-----------------\n";
+        cout << "1. Izvadit steku\n";
+        cout << "2. Noteikt steka garumu\n";
+        cout << "3. Pievienot elementu (steka beigaas)\n";
+        cout << "4. Iznemt elementu\n";
+        cout << "5. Dzest visu steku\n";
+        cout << "0. Iziet\n";
+        cout << "Ievadiet jusu izveli: ";
+        choice = getIntInput();
+
+        switch (choice)
+        {
+        case 1:
+            stack1.printStack();
+            cout << "Saraksta garums: " << stack1.getCount() << "\n";
+            waitForKey();
+            break;
+        case 2:
+            cout << "\nSaraksta garums: " << stack1.getCount() << "\n";
+            waitForKey();
+            break;
+        case 3:
+            cout << "Ievadiet jaunu elementu: ";
+            val = getIntInput();
+            stack1.add(val);
+            waitForKey();
+            break;
+        case 4:
+            val = stack1.pop();
+            if (val != NULL) cout << "\nNo steka tika iznemts elements " << val << "\n";
+            waitForKey();
+            break;
+        case 5:
+            stack1 = MyStack();
+            stack1.printStack();
+            waitForKey();
+            break;
+        case 0:
+            cout << "Iziet...\n";
+            return 0;
+        default:
+            cout << "Nepareiza izvele\n";
+        }
+    }
+}
