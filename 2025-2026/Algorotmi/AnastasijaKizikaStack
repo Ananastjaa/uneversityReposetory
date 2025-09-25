@@ -168,11 +168,11 @@ int main()
         {
         case 1:
             stack1.printStack();
-            cout << "Saraksta garums: " << stack1.getCount() << "\n";
+            cout << "Steka garums: " << stack1.getCount() << "\n";
             waitForKey();
             break;
         case 2:
-            cout << "\nSaraksta garums: " << stack1.getCount() << "\n";
+            cout << "\nSteka garums: " << stack1.getCount() << "\n";
             waitForKey();
             break;
         case 3:
