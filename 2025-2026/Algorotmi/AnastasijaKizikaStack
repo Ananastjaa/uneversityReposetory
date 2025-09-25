@@ -31,15 +31,6 @@ public:
     }
 };
 
-void deleteNotFirstElement(Node* element, Node* prev)
-{
-    Node* next = element->next;
-    delete element;
-
-    prev->next = next;
-    cout << "Elements dzests\n";
-}
-
 class MyStack
 {
 public:
