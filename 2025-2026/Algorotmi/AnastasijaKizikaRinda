@@ -151,11 +151,11 @@ int main()
         {
         case 1:
             stack1.printQueue();
-            cout << "Saraksta garums: " << stack1.getCount() << "\n";
+            cout << "Rindas garums: " << stack1.getCount() << "\n";
             waitForKey();
             break;
         case 2:
-            cout << "\nSaraksta garums: " << stack1.getCount() << "\n";
+            cout << "\nRindas garums: " << stack1.getCount() << "\n";
             waitForKey();
             break;
         case 3:
