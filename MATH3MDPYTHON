@@ -1,0 +1,135 @@
+
+
+from collections import defaultdict
+
+class UnionFind:
+    def __init__(self, vertices):
+        self.parent = {v: v for v in vertices}
+
+    def find(self, v):
+        if self.parent[v] != v:
+            self.parent[v] = self.find(self.parent[v])
+        return self.parent[v]
+
+    def union(self, u, v):
+        root_u = self.find(u)
+        root_v = self.find(v)
+        if root_u == root_v:
+            return False
+        self.parent[root_v] = root_u
+        return True
+
+def kruskal_max_sf(edge_list):
+    vertices = set()
+    for u, v, _ in edge_list:
+        vertices.update([u, v])
+    num_vertices = len(vertices)
+    num_edges = len(edge_list)
+    vertex_list = sorted(vertices)
+
+    sorted_edges = sorted(edge_list, key=lambda x: -x[2])  # Descending weights
+
+    uf = UnionFind(vertices)
+    sf_edges = []
+    total_weight = 0
+
+    for u, v, w in sorted_edges:
+        if uf.union(u, v):
+            sf_edges.append((u, v, w))
+            total_weight += w
+        if len(sf_edges) == num_vertices - 1:
+            break
+
+    component_map = defaultdict(list)
+    for v in vertices:
+        root = uf.find(v)
+        component_map[root].append(v)
+
+    component_edges = defaultdict(list)
+    for u, v, w in sf_edges:
+        root = uf.find(u)
+        component_edges[root].append((u, v, w))
+
+    return num_vertices, num_edges, vertex_list, sorted_edges, sf_edges, total_weight, component_map, component_edges
+
+# Weighted edge list: (u, v, weight)
+edges = [
+(15, 5, 1),
+(14, 20, 1),
+(20, 18, 1),
+(2, 10, 2),
+(19, 11, 2),
+(11, 12, 2),
+(16, 10, 3),
+(17, 7, 3),
+(4, 15, 3),
+(12, 18, 3),
+(9, 4, 4),
+(16, 19, 4),
+(6, 13, 4),
+(7, 12, 4),
+(12, 20, 4),
+(10, 14, 4),
+(2, 16, 5),
+(4, 19, 5),
+(13, 12, 5),
+(15, 3, 5),
+(11, 20, 5),
+(19, 10, 6),
+(8, 19, 7),
+(14, 1, 7),
+(1, 20, 7),
+(11, 18, 7),
+(3, 5, 8),
+(2, 13, 9),
+(13, 17, 10),
+(13, 11, 10),
+(9, 19, 11),
+(19, 6, 11),
+(3, 6, 11),
+(11, 14, 13),
+(2, 17, 14),
+(8, 16, 15),
+(5, 1, 15),
+(7, 13, 22),
+(6, 14, 23),
+(1, 6, 25),
+(15, 6, 28),
+(8, 9, 32),
+(5, 6, 52),
+(10, 13, 55),
+(15, 19, 56),
+]
+
+# Run algorithm
+result = kruskal_max_sf(edges)
+
+# Prepare output
+if result:
+    n, m, vertices, sorted_edges, msf, msf_weight, component_map, component_edges = result
+    is_connected = len(component_map) == 1
+    label = "Maximum Spanning Tree" if is_connected else "Maximum Spanning Forest"
+
+    print(f"Number of vertices: {n}")
+    print(f"Number of edges: {m}")
+    print(f"Vertices in the graph: {vertices}")
+
+    print("\nAll edges sorted by descending weight:")
+    for u, v, w in sorted_edges:
+        print(f"{u} - {v} (weight: {w})")
+
+    print(f"\nEdges in the {label}:")
+    for u, v, w in msf:
+        print(f"{u} - {v} (weight: {w})")
+
+    print(f"\nTotal weight of {label}: {msf_weight}")
+
+    if not is_connected:
+        for i, (root, nodes) in enumerate(component_map.items(), 1):
+            print(f"\nComponent #{i}: {sorted(nodes)}")
+            print(f"Maximum Spanning Tree #{i}:")
+            tree_weight = 0
+            for u, v, w in component_edges[root]:
+                print(f"{u} - {v} (weight: {w})")
+                tree_weight += w
+            print(f"Total weight of Maximum Spanning Tree #{i}: {tree_weight}")
